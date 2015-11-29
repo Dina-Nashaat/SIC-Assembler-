@@ -1,0 +1,17 @@
+.12345678901234567890123456789
+MATH     START   1000
+         LDA     ALPHA
+         ADD     inc
+         SUB     ONE
+         STA     BETA
+         LDA     GAMMA
+         ADD     inc
+         SUB     ONE
+         STA     DELTA
+ALPHA    WORD    5
+GAMMA    WORD    6
+inc      WORD    4
+ONE      WORD    1
+BETA     RESW    1
+DELTA    RESW    1
+         END     MATH

@@ -5,7 +5,17 @@
  */
 package pass1_1;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,6 +26,21 @@ public class Pass1_1 {
     /**
      */
     public static String locctr;
+    
+    public static ArrayList readAllLines ()
+    {
+        ArrayList<String> lines= new ArrayList<String>();
+        try {
+            Scanner s = new Scanner(new File ("SRCFILE"));
+            while(s.hasNextLine())
+            {
+                lines.add(s.nextLine());
+            }
+            s.close();
+        } catch (FileNotFoundException ex) {
+        }
+          return lines;
+    }
 
     static String addHex(String inputHex) {
         Integer inputDec = Integer.parseInt(inputHex, 16);
@@ -95,9 +120,9 @@ public class Pass1_1 {
         
         Hashtable symtab = new Hashtable();
         
-        String testStr = "Prbn01   START   1000";
+        ArrayList<String> line = new ArrayList<String>();
+        line = readAllLines();
         
-        System.out.println(readStm(testStr,"LABEL"));
     }
 
     
