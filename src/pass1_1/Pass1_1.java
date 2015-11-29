@@ -33,9 +33,39 @@ public class Pass1_1 {
         return x.startsWith("0");
     }
 
+    public static String readStm(String stmt, String type)
+    {
+        type = type.toLowerCase();
+        int start=0, end=0;
+        switch(type)
+        {
+            case "label":
+                start = 0;
+                end = 7;
+                break;
+            case "opcode":
+                start = 9;
+                end = 14;
+                break;
+            case "operand":
+                start = 17;
+                end = stmt.length();
+                break;
+            default:
+                return "unidentified operation";
+        }
+        String trgStm = stmt.substring(start, end);
+        return trgStm;
+    }
+    
+    public static boolean isComment (String stmt)
+    {        
+        if(stmt.startsWith("."))
+            return true;
+        return false;
+    }
     public static void main(String[] args) {
-        // TODO code application logic here
-        
+        // TODO code application logic here 
         Hashtable optab = new Hashtable();
         optab.put("add", 24);
         optab.put("and", 64);
@@ -64,7 +94,11 @@ public class Pass1_1 {
         optab.put("wd", 220);
         
         Hashtable symtab = new Hashtable();
-
+        
+        String testStr = "Prbn01   START   1000";
+        
+        System.out.println(readStm(testStr,"LABEL"));
     }
 
+    
 }
