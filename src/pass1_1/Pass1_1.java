@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -25,7 +27,7 @@ public class Pass1_1 {
 
     /**
      */
-    public static String locctr;
+    public static int locctr;
     
     public static ArrayList readAllLines ()
     {
@@ -41,7 +43,16 @@ public class Pass1_1 {
         }
           return lines;
     }
-
+    
+    public static void writeLine(String line)
+    {
+        try {
+            PrintWriter writer = new PrintWriter("INTFILE");
+            writer.println(line);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     static String addHex(String inputHex) {
         Integer inputDec = Integer.parseInt(inputHex, 16);
         inputDec += 3;
@@ -91,6 +102,7 @@ public class Pass1_1 {
     }
     public static void main(String[] args) {
         // TODO code application logic here 
+        int startAddress;
         Hashtable optab = new Hashtable();
         optab.put("add", 24);
         optab.put("and", 64);
@@ -120,9 +132,28 @@ public class Pass1_1 {
         
         Hashtable symtab = new Hashtable();
         
-        ArrayList<String> line = new ArrayList<String>();
-        line = readAllLines();
+        ArrayList<String> lines = new ArrayList<String>();
+        lines = readAllLines();
+        String line;
+        line = lines.get(0);                                                    //read first input lines
+        if (readStm(line,"opcode").equals("START"))                             //if OPCODE = 'START' then
+            {   
+                startAddress = Integer.parseInt(readStm(line,"operand"));       //save #[operand] as starting address
+                locctr = startAddress;                                          //initialize LOCCTR to starting address
+                writeLine(line);                                                //Write line to intermediate file
+                line = lines.get(1);                                            //Read next input line
+                //System.out.println(startAddress);
+            }
+        else
+                locctr=0;                                                       //else initialize locctr to zero
+        while(!readStm(line,"opcode").equals("END"))                            //while OPCODE != END
+        {
+            if(!isComment(line))
+            {
+                
+            }
         
+        }
     }
 
     
