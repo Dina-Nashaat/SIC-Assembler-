@@ -28,24 +28,21 @@ public class Pass1_1 {
     /**
      */
     public static int locctr;
-    
-    public static ArrayList readAllLines ()
-    {
-        ArrayList<String> lines= new ArrayList<String>();
+
+    public static ArrayList readAllLines() {
+        ArrayList<String> lines = new ArrayList<String>();
         try {
-            Scanner s = new Scanner(new File ("SRCFILE"));
-            while(s.hasNextLine())
-            {
+            Scanner s = new Scanner(new File("SRCFILE"));
+            while (s.hasNextLine()) {
                 lines.add(s.nextLine());
             }
             s.close();
         } catch (FileNotFoundException ex) {
         }
-          return lines;
+        return lines;
     }
-    
-    public static void writeLine(String line)
-    {
+
+    public static void writeLine(String line) {
         try {
             PrintWriter writer = new PrintWriter("INTFILE");
             writer.println(line);
@@ -53,6 +50,7 @@ public class Pass1_1 {
             Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     static String addHex(String inputHex) {
         Integer inputDec = Integer.parseInt(inputHex, 16);
         inputDec += 3;
@@ -69,12 +67,10 @@ public class Pass1_1 {
         return x.startsWith("0");
     }
 
-    public static String readStm(String stmt, String type)
-    {
+    public static String readStm(String stmt, String type) {
         type = type.toLowerCase();
-        int start=0, end=0;
-        switch(type)
-        {
+        int start = 0, end = 0;
+        switch (type) {
             case "label":
                 start = 0;
                 end = 7;
@@ -90,19 +86,20 @@ public class Pass1_1 {
             default:
                 return "unidentified operation";
         }
-        String trgStm = stmt.substring(start, end);
+        String trgStm = stmt.substring(start, end).trim().toLowerCase();
         return trgStm;
     }
-    
-    public static boolean isComment (String stmt)
-    {        
-        if(stmt.startsWith("."))
+
+    public static boolean isComment(String stmt) {
+        if (stmt.startsWith(".")) {
             return true;
+        }
         return false;
     }
+
     public static void main(String[] args) {
         // TODO code application logic here 
-        int startAddress;
+        int startAddress = 0;
         Hashtable optab = new Hashtable();
         optab.put("add", 24);
         optab.put("and", 64);
@@ -129,32 +126,79 @@ public class Pass1_1 {
         optab.put("td", 224);
         optab.put("tix", 44);
         optab.put("wd", 220);
-        
+
         Hashtable symtab = new Hashtable();
-        
+
         ArrayList<String> lines = new ArrayList<String>();
         lines = readAllLines();
         String line;
-        line = lines.get(0);                                                    //read first input lines
-        if (readStm(line,"opcode").equals("START"))                             //if OPCODE = 'START' then
-            {   
-                startAddress = Integer.parseInt(readStm(line,"operand"));       //save #[operand] as starting address
-                locctr = startAddress;                                          //initialize LOCCTR to starting address
-                writeLine(line);                                                //Write line to intermediate file
-                line = lines.get(1);                                            //Read next input line
-                //System.out.println(startAddress);
-            }
-        else
-                locctr=0;                                                       //else initialize locctr to zero
-        while(!readStm(line,"opcode").equals("END"))                            //while OPCODE != END
+        int i = 0;
+        do {
+            line = lines.get(i);
+            i++;
+        } while (isComment(line));
+        if (readStm(line, "opcode").equals("START")) //if OPCODE = 'START' then
         {
-            if(!isComment(line))
-            {
-                
+            startAddress = Integer.parseInt(readStm(line, "operand"));       //save #[operand] as starting address
+            locctr = startAddress;                                          //initialize LOCCTR to starting address
+            writeLine(line);                                                //Write line to intermediate file
+            line = lines.get(i);                                            //Read next input line
+            //System.out.println(startAddress);
+        } else {
+            locctr = 0;                                                       //else initialize locctr to zero
+        }
+        while (!readStm(line, "opcode").equals("END")) //while OPCODE != END
+        {
+            line = lines.get(i);
+            if (!isComment(line)) {
+                if (symtab.containsKey(readStm(line, "label"))) {
+                    printError("duplicate error");
+                } else {
+                    symtab.put(readStm(line, "label"), locctr);
+                    System.out.println(readStm(line, "label"));
+                    i++;
+                }
+
+                if (optab.containsKey(readStm(line, "opcode"))) {
+                    locctr = locctr + 3;
+                } else if (readStm(line, "opcode").equals("WORD")) {
+                    locctr = locctr + 3;
+                } else if (readStm(line, "opcode").equals("RESW")) {
+                    try {
+                        locctr = locctr + 3 * Integer.parseInt(readStm(line, "operand"));
+                    } catch (Exception ex) {
+                        printError("Invalid Operator");
+                    }
+                } else if (readStm(line, "opcode").equals("RESB")) {
+                    try {
+                        locctr = locctr + Integer.parseInt(readStm(line, "opcode"));
+                    } catch (Exception ex) {
+                        printError("Invalid Operator");
+                    }
+
+                } else if (readStm(line, "opcode").equals("BYTE")) {
+                   int byteLength = readStm(line, "opcode").length();
+                    try {
+                        locctr = locctr + byteLength;
+                    } catch (Exception ex) {
+                        printError("Invalid Operator");
+                    }
+
+                } else printError("Invalid Operation");
             }
-        
+            writeLine(line);
+            i++;
+        }
+        writeLine(line);
+        int programLength = locctr - startAddress;
+    }
+
+    private static void printError(String errormessage) {
+
+        switch (errormessage) {
+            case "duplicate error":
+
         }
     }
 
-    
 }
