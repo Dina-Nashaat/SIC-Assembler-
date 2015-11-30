@@ -5,10 +5,12 @@
  */
 package pass1_1;
 
+import static java.awt.JobAttributes.DestinationType.FILE;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -27,8 +29,8 @@ public class Pass1_1 {
 
     /**
      */
-    public static int locctr;
-
+    public static String locctr = "0";
+    
     public static ArrayList readAllLines() {
         ArrayList<String> lines = new ArrayList<String>();
         try {
@@ -42,18 +44,21 @@ public class Pass1_1 {
         return lines;
     }
 
-    public static void writeLine(String line) {
+    public static void writeLine(String line, File file) {
+            
         try {
-            PrintWriter writer = new PrintWriter("INTFILE");
+            FileWriter fw = new FileWriter(file, true);
+            PrintWriter writer = new PrintWriter(fw);
             writer.println(line);
-        } catch (FileNotFoundException ex) {
+            writer.close();
+        } catch (IOException ex) {
             Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    static String addHex(String inputHex) {
+    static String addHex(String inputHex, int i) {
         Integer inputDec = Integer.parseInt(inputHex, 16);
-        inputDec += 3;
+        inputDec += i;
         String outputHex = Integer.toHexString(inputDec);
         return outputHex;
     }
@@ -99,7 +104,16 @@ public class Pass1_1 {
 
     public static void main(String[] args) {
         // TODO code application logic here 
-        int startAddress = 0;
+        File file = new File("INTFILE");
+        if(file.exists()) {
+            file.delete();
+        }else
+            try {
+                file.createNewFile();
+        } catch (IOException ex) {
+            Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String startAddress = "0";
         Hashtable optab = new Hashtable();
         optab.put("add", 24);
         optab.put("and", 64);
@@ -133,71 +147,81 @@ public class Pass1_1 {
         lines = readAllLines();
         String line;
         int i = 0;
-        do {
-            line = lines.get(i);
+        line = lines.get(i);
+        while (isComment(line)) {
             i++;
-        } while (isComment(line));
-        if (readStm(line, "opcode").equals("START")) //if OPCODE = 'START' then
+            line = lines.get(i);
+        }
+        if (readStm(line, "opcode").equals("start")) //if OPCODE = 'START' then
         {
-            startAddress = Integer.parseInt(readStm(line, "operand"));       //save #[operand] as starting address
-            locctr = startAddress;                                          //initialize LOCCTR to starting address
-            writeLine(line);                                                //Write line to intermediate file
-            line = lines.get(i);                                            //Read next input line
+            startAddress = readStm(line, "operand");                            //save #[operand] as starting address
+            locctr = startAddress;                                              //initialize LOCCTR to starting address
+            //writeLine(line, file);                                                    //Write line to intermediate file
+            line = lines.get(i);                                                //Read next input line
             //System.out.println(startAddress);
         } else {
-            locctr = 0;                                                       //else initialize locctr to zero
+            locctr = "0";                                                       //else initialize locctr to zero
         }
-        while (!readStm(line, "opcode").equals("END")) //while OPCODE != END
+        while (!readStm(line, "opcode").equals("end")) //while OPCODE != END
         {
-            line = lines.get(i);
-            if (!isComment(line)) {
-                if (symtab.containsKey(readStm(line, "label"))) {
-                    printError("duplicate error");
-                } else {
-                    symtab.put(readStm(line, "label"), locctr);
-                    System.out.println(readStm(line, "label"));
-                    i++;
+            line = lines.get(i);                                                //Get line. 
+            if (!isComment(line)) {                                             //If line is not a comment
+                if (symtab.containsKey(readStm(line, "label"))) {               //If there is a label in the LABEL field, Search symtab for Label
+                    printError("duplicate error");                              //Print out Error
+                } else {                                                        //If not
+                    if(!(readStm(line, "label").equals("")))
+                        symtab.put(readStm(line, "label"), locctr);                 //Insert Label into symtable
                 }
-
-                if (optab.containsKey(readStm(line, "opcode"))) {
-                    locctr = locctr + 3;
-                } else if (readStm(line, "opcode").equals("WORD")) {
-                    locctr = locctr + 3;
-                } else if (readStm(line, "opcode").equals("RESW")) {
+                if (optab.containsKey(readStm(line, "opcode"))) {               //Search optab for opcode
+                    locctr = addHex(locctr, 3);                                  //Found; Add 3 to locctr
+                } else if (readStm(line, "opcode").equals("word")) {            //opcode not found but equal to WORD
+                    locctr = addHex(locctr, 3);                                  //Founnd; Add 3 to locctr
+                } else if (readStm(line, "opcode").equals("resw")) {            //opcode not found but equal to RESW
                     try {
-                        locctr = locctr + 3 * Integer.parseInt(readStm(line, "operand"));
+                        int operandOp = (3 * Integer.parseInt(readStm(line, "operand"), 16));
+                        locctr = addHex(locctr, operandOp);                      //Found; 3*opcode+locctr
                     } catch (Exception ex) {
                         printError("Invalid Operator");
                     }
-                } else if (readStm(line, "opcode").equals("RESB")) {
+                } else if (readStm(line, "opcode").equals("resb")) {            //opcode not found but equal to BYTE
                     try {
-                        locctr = locctr + Integer.parseInt(readStm(line, "opcode"));
-                    } catch (Exception ex) {
-                        printError("Invalid Operator");
-                    }
-
-                } else if (readStm(line, "opcode").equals("BYTE")) {
-                   int byteLength = readStm(line, "opcode").length();
-                    try {
-                        locctr = locctr + byteLength;
+                        locctr = addHex(locctr, Integer.parseInt(readStm(line, "opcode")));  //Found; add #operand to locctr
                     } catch (Exception ex) {
                         printError("Invalid Operator");
                     }
 
-                } else printError("Invalid Operation");
+                } else if (readStm(line, "opcode").equals("byte")) {
+                    int byteLength = readStm(line, "opcode").length();           //find length in bytes
+                    try {
+                        locctr = addHex(locctr, byteLength);                     //add length to LOCCTR
+                    } catch (Exception ex) {
+                        printError("Invalid Operator");
+                    }
+                } else if (readStm(line, "opcode").equals("start")) {
+                    writeLine(line,file);
+                    i++;
+                    continue;
+                } else if (readStm(line, "opcode").equals("end")) {
+                    writeLine(line,file);
+                    i++;
+                    break;
+                } else {
+                    printError("Invalid Operation Code");
+                }
             }
-            writeLine(line);
+            writeLine(line,file);
             i++;
         }
-        writeLine(line);
-        int programLength = locctr - startAddress;
+        try {
+            int programLength = Integer.parseInt(locctr) - Integer.parseInt(startAddress);
+        } catch (NumberFormatException ex) {
+        }
     }
 
     private static void printError(String errormessage) {
 
         switch (errormessage) {
             case "duplicate error":
-
         }
     }
 
