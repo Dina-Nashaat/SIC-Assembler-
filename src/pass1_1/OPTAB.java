@@ -1,3 +1,4 @@
+package pass1_1;
 
 import java.util.Hashtable;
 
@@ -6,16 +7,16 @@ import java.util.Hashtable;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Heba
  */
 public class OPTAB {
-    
-    Hashtable optab = new Hashtable();
+
+    static Hashtable optab = new Hashtable();
 
     public OPTAB() {
+        //Hashtable optab = new Hashtable();
         optab.put("add", 24);
         optab.put("and", 64);
         optab.put("comp", 40);
@@ -42,6 +43,5 @@ public class OPTAB {
         optab.put("tix", 44);
         optab.put("wd", 220);
     }
-    
-        
+
 }

@@ -91,6 +91,9 @@ public class Pass1_1 {
                 start = 17;
                 end = stmt.length();
                 break;
+            case "comment":
+                start = 35;
+                end = stmt.length();
             default:
                 return "Unidentified operation";
         }
@@ -115,33 +118,7 @@ public class Pass1_1 {
             }
         }
 
-        Hashtable optab = new Hashtable();
-        optab.put("add", 24);
-        optab.put("and", 64);
-        optab.put("comp", 40);
-        optab.put("div", 36);
-        optab.put("j", 60);
-        optab.put("jeq", 48);
-        optab.put("jgt", 52);
-        optab.put("jlt", 56);
-        optab.put("jsub", 72);
-        optab.put("lda", 0);
-        optab.put("ldch", 80);
-        optab.put("ldl", 8);
-        optab.put("ldx", 4);
-        optab.put("mul", 32);
-        optab.put("or", 68);
-        optab.put("rd", 216);
-        optab.put("rsub", 76);
-        optab.put("sta", 12);
-        optab.put("stch", 84);
-        optab.put("stl", 20);
-        optab.put("stx", 16);
-        optab.put("sub", 28);
-        optab.put("td", 224);
-        optab.put("tix", 44);
-        optab.put("wd", 220);
-
+        OPTAB optab = new OPTAB();
         Hashtable symtab = new Hashtable();
 
         ArrayList<String> lines = new ArrayList<String>();
@@ -156,26 +133,28 @@ public class Pass1_1 {
         if (readStm(line, "opcode").equals("start")) //if OPCODE = 'START' then
         {
             startAddress = readStm(line, "operand");                                    //save #[operand] as starting address
-            locctr = startAddress;                                                                 //initialize LOCCTR to starting address
+            locctr = startAddress;                                                               //initialize LOCCTR to starting address
+            writeLine(line, file);
+            i++;
+            line = lines.get(i);
             //writeLine(line, file);                                                                  //Write line to intermediate file
             //System.out.println(startAddress);
         } else {
             locctr = "0";                                                                                    //else initialize locctr to zero
         }
-        i++;
-        line = lines.get(i);
+
         while (!readStm(line, "opcode").equals("end")) //while OPCODE != END
         {
             if (!isComment(line)) {                                                                       //If line is not a comment
                 if (symtab.containsKey(readStm(line, "label"))) {                       //If there is a label in the LABEL field, Search symtab for Label
                     printError("duplicate error");                                                 //Print out Error
-                } else{                                                                                           //If not
+                } else {                                                                                           //If not
                     if (!(readStm(line, "label").equals(""))) {
-                    symtab.put(readStm(line, "label"), locctr);                        //Insert Label into symtable
-                }
+                        symtab.put(readStm(line, "label"), locctr);                        //Insert Label into symtable
+                    }
                 }
 
-                if (optab.containsKey(readStm(line, "opcode"))) {                   //Search optab for opcode
+                if (OPTAB.optab.containsKey(readStm(line, "opcode"))) {                   //Search optab for opcode
                     locctr = addHex(locctr, 3);                                                  //Found; Add 3 to locctr
                 } else if (readStm(line, "opcode").equals("word")) {               //opcode not found but equal to WORD
                     locctr = addHex(locctr, 3);                                                 //Founnd; Add 3 to locctr
@@ -206,6 +185,10 @@ public class Pass1_1 {
             }
             i++;
             line = lines.get(i);
+            while (isComment(line)) {
+                i++;
+                line = lines.get(i);
+            }
         }
         if (readStm(line, "opcode").equals("end")) {
             writeLine(line, file);
@@ -214,10 +197,11 @@ public class Pass1_1 {
             programLength = Integer.parseInt(locctr, 16) - Integer.parseInt(startAddress, 16);
         } catch (NumberFormatException ex) {
         }
-        //System.out.println("Start Address = " +startAddress);
-        //System.out.println("LCCTR = " + locctr.toUpperCase());
-        //System.out.println("Program Length = " + programLength);
-
+        /*
+        System.out.println("Start Address = " + startAddress);
+        System.out.println("LCCTR = " + locctr.toUpperCase());
+        System.out.println("Program Length = " + programLength);
+        */
     }
 
     private static void printError(String errormessage) {

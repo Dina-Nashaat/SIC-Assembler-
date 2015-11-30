@@ -1,3 +1,4 @@
+math     start   1000
          lda     alpha
          add     inc
          sub     one
