@@ -16,7 +16,7 @@ public class OPTAB {
     static Hashtable optab = new Hashtable();
 
     public OPTAB() {
-        //Hashtable optab = new Hashtable();
+
         optab.put("add", 24);
         optab.put("and", 64);
         optab.put("comp", 40);

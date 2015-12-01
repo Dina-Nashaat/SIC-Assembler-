@@ -26,13 +26,14 @@ import java.util.logging.Logger;
  *
  * @author Heba
  */
-public class Pass1_1 {
+public class Pass1 {
 
     /**
      */
     public static String locctr = "0";
-    public static String startAddress = "0";
+    public static String startAddress;
     public static int programLength;
+    public static Hashtable symtab = new Hashtable();
 
     public static ArrayList readAllLines() {
         ArrayList<String> lines = new ArrayList<String>();
@@ -45,7 +46,7 @@ public class Pass1_1 {
         } catch (FileNotFoundException ex) {
         }
         return lines;
-    }
+    }    
 
     public static void writeLine(String line, File file) {
 
@@ -55,7 +56,7 @@ public class Pass1_1 {
             writer.println(line.toLowerCase());
             writer.close();
         } catch (IOException ex) {
-            Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -114,12 +115,11 @@ public class Pass1_1 {
             try {
                 file.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(Pass1_1.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
         OPTAB optab = new OPTAB();
-        Hashtable symtab = new Hashtable();
 
         ArrayList<String> lines = new ArrayList<String>();
         lines = readAllLines();
@@ -204,7 +204,7 @@ public class Pass1_1 {
         */
     }
 
-    private static void printError(String errormessage) {
+    public static void printError(String errormessage) {
         System.out.println(errormessage);
     }
 }
