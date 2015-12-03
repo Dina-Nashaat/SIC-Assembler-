@@ -45,11 +45,11 @@ public class Pass2 {
 
     public static String writeObjectProg(String type, String order) {
         String line = null;
-        switch (type.toLowerCase()) {
-            case "h":
+        switch (type) {
+            case "H":
                 line = "H" + progName + startAddress + programLength;
                 break;
-            case "t":
+            case "T":
                 switch (order) {
                     case "initialise":
                         line = "T" + recStart + recLength + objcode;
@@ -59,7 +59,7 @@ public class Pass2 {
                         break;
                 }
                 break;
-            case "e":
+            case "E":
                 line = "E" + startAddress;
                 break;
             default:
@@ -71,11 +71,10 @@ public class Pass2 {
     public static void main(String[] args) {
 
         File file2 = new File("LISTFILE");
-        ArrayList<String> lines = new ArrayList<String>();
-        lines = readAllLines2();
-
         File file3 = new File("OBJFILE");
 
+        ArrayList<String> lines = new ArrayList<String>();
+        lines = readAllLines2();
         int j = 0;
         String current = lines.get(j);
 
@@ -95,15 +94,13 @@ public class Pass2 {
 
         while (!readStm(current, "opcode").equals("end")) {
             if (!isComment(current)) {
-
                 if (OPTAB.optab.containsKey(readStm(current, "opcode"))) {
-
-                    if (readStm(current, "operand") != "") {
-
+                    if (readStm(current, "operand").startsWith("0")) {
+                        opAdd = readStm(current, "operand").substring(1);
+                    } else if (readStm(current, "operand") != "") {
                         if (readStm(current, "operand").contains(",")) {
                             int cut = readStm(current, "operand").indexOf(",");
                             String operand = readStm(current, "operand").substring(0, cut - 1);
-
                             if (Pass1.symtab.containsKey(operand)) {
                                 opAdd = (String) Pass1.symtab.get(operand);
                                 x = Integer.parseInt(readStm(current, "operand").substring(cut + 1));
@@ -111,7 +108,6 @@ public class Pass2 {
                                 opAdd = "0";
                                 Pass1.printError("Undefined Symbol");
                             }
-
                         } else {
                             if (Pass1.symtab.containsKey(readStm(current, "operand"))) {
                                 opAdd = (String) Pass1.symtab.get(readStm(current, "operand"));
@@ -120,26 +116,21 @@ public class Pass2 {
                                 Pass1.printError("Undefined Symbol");
                             }
                         }
-
                     }
-
                 } else {
                     opAdd = "0";
                     /*assemble instruction object code*/
                     objcode = (String) OPTAB.optab.get(readStm(current, "opcode")) + opAdd;
                 }
-
             } else if (readStm(current, "opcode").equals("BYTE") || readStm(current, "opcode").equals("WORD")) {
                 objcode = readStm(current, "operand");
             }
             if (/*object code wont fit in current T record*/) {
-
                 /*write T record to object program*/
                 temp = writeObjectProg("T", "initialise");
                 Pass1.writeLine(temp, file3);
                 //*initialise new T record*
             }
-
             /*add object code to T record*/
             temp = writeObjectProg("T", "add");
             Pass1.writeLine(temp, file3);

@@ -5,17 +5,11 @@
  */
 package pass1_1;
 
-import static java.awt.JobAttributes.DestinationType.FILE;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import static java.lang.System.exit;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
@@ -28,8 +22,6 @@ import java.util.logging.Logger;
  */
 public class Pass1 {
 
-    /**
-     */
     public static String locctr = "0";
     public static String startAddress;
     public static int programLength;
@@ -46,7 +38,7 @@ public class Pass1 {
         } catch (FileNotFoundException ex) {
         }
         return lines;
-    }    
+    }
 
     public static void writeLine(String line, File file) {
 
@@ -106,6 +98,10 @@ public class Pass1 {
         return stmt.startsWith(".");
     }
 
+    public static void printError(String errormessage) {
+        System.out.println(errormessage);
+    }
+
     public static void main(String[] args) {
         // TODO code application logic here 
         File file = new File("INTFILE");
@@ -120,16 +116,17 @@ public class Pass1 {
         }
 
         OPTAB optab = new OPTAB();
-
         ArrayList<String> lines = new ArrayList<String>();
         lines = readAllLines();
         String line;
         int i = 0;
-        line = lines.get(i);                                                                                 //Read next input line
+        line = lines.get(i);                                              //Read next input line
+        
         while (isComment(line)) {
             i++;
             line = lines.get(i);
         }
+        
         if (readStm(line, "opcode").equals("start")) //if OPCODE = 'START' then
         {
             startAddress = readStm(line, "operand");                                    //save #[operand] as starting address
@@ -142,7 +139,7 @@ public class Pass1 {
         } else {
             locctr = "0";                                                                                    //else initialize locctr to zero
         }
-
+        
         while (!readStm(line, "opcode").equals("end")) //while OPCODE != END
         {
             if (!isComment(line)) {                                                                       //If line is not a comment
@@ -153,7 +150,6 @@ public class Pass1 {
                         symtab.put(readStm(line, "label"), locctr);                        //Insert Label into symtable
                     }
                 }
-
                 if (OPTAB.optab.containsKey(readStm(line, "opcode"))) {                   //Search optab for opcode
                     locctr = addHex(locctr, 3);                                                  //Found; Add 3 to locctr
                 } else if (readStm(line, "opcode").equals("word")) {               //opcode not found but equal to WORD
@@ -198,13 +194,9 @@ public class Pass1 {
         } catch (NumberFormatException ex) {
         }
         /*
-        System.out.println("Start Address = " + startAddress);
-        System.out.println("LCCTR = " + locctr.toUpperCase());
-        System.out.println("Program Length = " + programLength);
-        */
-    }
-
-    public static void printError(String errormessage) {
-        System.out.println(errormessage);
+         System.out.println("Start Address = " + startAddress);
+         System.out.println("LCCTR = " + locctr.toUpperCase());
+         System.out.println("Program Length = " + programLength);
+         */
     }
 }
