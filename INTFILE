@@ -1,16 +1,2 @@
-math     start   1000
-         lda     alpha
-         add     inc
-         sub     one
-         sta     beta
-         lda     gamma
-         add     inc
-         sub     one
-         sta     delta
-alpha    word    5
-gamma    word    6
-inc      word    4
-one      word    1
-beta     resw    1
-delta    resw    1
-         end     math
+copy     start   1000
+         rsub

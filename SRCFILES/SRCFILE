@@ -1,5 +1,5 @@
 .12345678901234567890123456789
-MATH     START   1000
+Math     START   1000
          LDA     ALPHA
          ADD     inc
          SUB     ONE
@@ -14,4 +14,4 @@ inc      WORD    4
 ONE      WORD    1
 BETA     RESW    1
 DELTA    RESW    1
-         END     MATH
+         END     Math

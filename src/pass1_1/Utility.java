@@ -69,19 +69,37 @@ public class Utility {
      
      public static String readStm(String stmt, String type) {
         type = type.toLowerCase();
-        int start, end;
+        int start, end=stmt.length();
+        
         switch (type) {
             case "label":
+                if (stmt.substring(0,7).contains("      "))
+                    return "";
+                else if(stmt.substring(0, 7).startsWith(" "))
+                    return "Invalid Label String";
                 start = 0;
                 end = 7;
                 break;
             case "opcode":
+                if (stmt.substring(9,stmt.length()).startsWith(" "))
+                   return "Invalid Opcode String";
                 start = 9;
-                end = 14;
+                if(stmt.length()<14)
+                    end = stmt.length();
+                else end = 14;
                 break;
             case "operand":
+                if (stmt.substring(17,stmt.length()).startsWith(" "))
+                    return "Invalid Operand String";
                 start = 17;
-                end = stmt.length();
+                if(stmt.length()<=34)
+                    end = stmt.length();
+                else 
+                { 
+                    end = 34;
+                    return "Invalid Operand";
+                }
+
                 break;
             case "comment":
                 start = 35;
@@ -127,7 +145,7 @@ public class Utility {
                 break;
             case "T":
                 switch (order) {
-                    case "initialise":
+                    case "initialize":
                         line = "T" + recStart + recLength + objcode;
                         break;
                     case "add":

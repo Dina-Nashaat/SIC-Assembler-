@@ -33,14 +33,15 @@ public class Pass2 {
     public static int x = 0;
 
     public static void main(String[] args) {
-
+        
+        //Create LISTFILE and OBJFILE
        File lstFile = Utility.checkFile("LISTFILE");
        File objFile = Utility.checkFile("OBJFILE");
        
         ArrayList<String> lines = new ArrayList<String>();
         lines = Utility.readAllLines("INTFILE");
 
-        int j = 0;
+        int j = 0;      //Lines counter
         String current = lines.get(j);
 
         if (Utility.readStm(current, "opcode").equals("start")) {
@@ -49,18 +50,19 @@ public class Pass2 {
             j++;
             current = lines.get(j);
         }
+        else
+            Utility.printError("No Starting Address");
 
-        /*write H record in object program*/
-        temp = Utility.writeObjectProg("H", null);
+        temp = Utility.writeObjectProg("H", null);                              //write H record in object program
         Utility.writeLine(temp, objFile);
         /*initialise T record*/
-        temp = Utility.writeObjectProg("T", "initialise");
+        temp = Utility.writeObjectProg("T", "initialize");
         Utility.writeLine(temp, objFile);
 
-        while (!Utility.readStm(current, "opcode").equals("end")) {
+        while (!Utility.readStm(current, "opcode").equals("end")) {                                     //While this is not end of program
             if (!isComment(current)) {                                                                  //If this is not a comment
-                if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                              //Search optab for opcode
-                    if (Utility.readStm(current, "operand").startsWith("0")) {                                  //found, 
+                if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                      //Search optab for opcode
+                    if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
                     } else if (Utility.readStm(current, "operand") != "") {
                         if (Utility.readStm(current, "operand").contains(",")) {                                //Indexing

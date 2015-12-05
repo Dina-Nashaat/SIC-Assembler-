@@ -32,6 +32,7 @@ public class Pass1 {
 
     public static void main(String[] args) {
         
+        //Create new File
         File intFile = Utility.checkFile("INTFILE");
         
         OPTAB optab = new OPTAB();
