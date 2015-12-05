@@ -9,12 +9,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import static pass1_1.Pass1.isComment;
 import static pass1_1.Pass1.programLength;
-import static pass1_1.Pass1.readStm;
 import static pass1_1.Pass1.startAddress;
-import static pass1_1.Pass1.writeLine;
 import static pass1_1.Pass2.temp;
+import pass1_1.Utility;
+import static pass1_1.Utility.addHex;
+import static pass1_1.Utility.isComment;
+import static pass1_1.Utility.printError;
+
 
 /**
  *
@@ -30,121 +32,86 @@ public class Pass2 {
     public static int recLength;
     public static int x = 0;
 
-    public static ArrayList readAllLines2() {
-        ArrayList<String> lines = new ArrayList<String>();
-        try {
-            Scanner s = new Scanner(new File("INTFILE"));
-            while (s.hasNextLine()) {
-                lines.add(s.nextLine());
-            }
-            s.close();
-        } catch (FileNotFoundException ex) {
-        }
-        return lines;
-    }
-
-    public static String writeObjectProg(String type, String order) {
-        String line = null;
-        switch (type) {
-            case "H":
-                line = "H" + progName + startAddress + programLength;
-                break;
-            case "T":
-                switch (order) {
-                    case "initialise":
-                        line = "T" + recStart + recLength + objcode;
-                        break;
-                    case "add":
-                        line = objcode;
-                        break;
-                }
-                break;
-            case "E":
-                line = "E" + startAddress;
-                break;
-            default:
-                Pass1.printError("Undefined Record");
-        }
-        return line;
-    }
-
     public static void main(String[] args) {
 
-        File file2 = new File("LISTFILE");
-        File file3 = new File("OBJFILE");
-
+       File lstFile = Utility.checkFile("LISTFILE");
+       File objFile = Utility.checkFile("OBJFILE");
+       
         ArrayList<String> lines = new ArrayList<String>();
-        lines = readAllLines2();
+        lines = Utility.readAllLines("INTFILE");
+
         int j = 0;
         String current = lines.get(j);
 
-        if (readStm(current, "opcode").equals("start")) {
-            Pass1.writeLine(current, file2);
-            progName = readStm(current, "label");
+        if (Utility.readStm(current, "opcode").equals("start")) {
+            Utility.writeLine(current, lstFile);
+            progName = Utility.readStm(current, "label");
             j++;
             current = lines.get(j);
         }
 
         /*write H record in object program*/
-        temp = writeObjectProg("H", null);
-        Pass1.writeLine(temp, file3);
+        temp = Utility.writeObjectProg("H", null);
+        Utility.writeLine(temp, objFile);
         /*initialise T record*/
-        temp = writeObjectProg("T", "initialise");
-        Pass1.writeLine(temp, file3);
+        temp = Utility.writeObjectProg("T", "initialise");
+        Utility.writeLine(temp, objFile);
 
-        while (!readStm(current, "opcode").equals("end")) {
-            if (!isComment(current)) {
-                if (OPTAB.optab.containsKey(readStm(current, "opcode"))) {
-                    if (readStm(current, "operand").startsWith("0")) {
-                        opAdd = readStm(current, "operand").substring(1);
-                    } else if (readStm(current, "operand") != "") {
-                        if (readStm(current, "operand").contains(",")) {
-                            int cut = readStm(current, "operand").indexOf(",");
-                            String operand = readStm(current, "operand").substring(0, cut - 1);
+        while (!Utility.readStm(current, "opcode").equals("end")) {
+            if (!isComment(current)) {                                                                  //If this is not a comment
+                if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                              //Search optab for opcode
+                    if (Utility.readStm(current, "operand").startsWith("0")) {                                  //found, 
+                        opAdd = Utility.readStm(current, "operand").substring(1);
+                    } else if (Utility.readStm(current, "operand") != "") {
+                        if (Utility.readStm(current, "operand").contains(",")) {                                //Indexing
+                            int cut = Utility.readStm(current, "operand").indexOf(",");
+                            String operand = Utility.readStm(current, "operand").substring(0, cut - 1);
                             if (Pass1.symtab.containsKey(operand)) {
                                 opAdd = (String) Pass1.symtab.get(operand);
-                                x = Integer.parseInt(readStm(current, "operand").substring(cut + 1));
+                                x = Integer.parseInt(Utility.readStm(current, "operand").substring(cut + 1));// law el x be 1, incremenet OPAdd, nezawed 3al PC el x
                             } else {
                                 opAdd = "0";
-                                Pass1.printError("Undefined Symbol");
+                                Utility.printError("Undefined Symbol");
                             }
                         } else {
-                            if (Pass1.symtab.containsKey(readStm(current, "operand"))) {
-                                opAdd = (String) Pass1.symtab.get(readStm(current, "operand"));
+                            if (Pass1.symtab.containsKey(Utility.readStm(current, "operand"))) {
+                                opAdd = (String) Pass1.symtab.get(Utility.readStm(current, "operand"));
                             } else {
                                 opAdd = "0";
-                                Pass1.printError("Undefined Symbol");
+                                Utility.printError("Undefined Symbol");
                             }
                         }
                     }
                 } else {
                     opAdd = "0";
                     /*assemble instruction object code*/
-                    objcode = (String) OPTAB.optab.get(readStm(current, "opcode")) + opAdd;
+                    objcode = (String) OPTAB.optab.get(Utility.readStm(current, "opcode")) + opAdd;
                 }
-            } else if (readStm(current, "opcode").equals("BYTE") || readStm(current, "opcode").equals("WORD")) {
-                objcode = readStm(current, "operand");
+            } else if (Utility.readStm(current, "opcode").equals("BYTE") || Utility.readStm(current, "opcode").equals("WORD")) {
+                objcode = Utility.readStm(current, "operand");
             }
-            if (/*object code wont fit in current T record*/) {
+            
+            //if (/*object code wont fit in current T record*/) {
                 /*write T record to object program*/
-                temp = writeObjectProg("T", "initialise");
-                Pass1.writeLine(temp, file3);
+              //  temp = writeObjectProg("T", "initialise");
+               // Pass1.writeLine(temp, file3);
                 //*initialise new T record*
-            }
+            //}
+            
             /*add object code to T record*/
-            temp = writeObjectProg("T", "add");
-            Pass1.writeLine(temp, file3);
+            temp = Utility.writeObjectProg("T", "add");
+            Utility.writeLine(temp, objFile);
         }
 
         //*write listing line*
         j++;
         current = lines.get(j);
         /*write last T record to object program*/
-        temp = writeObjectProg("T", "add");
-        Pass1.writeLine(temp, file3);
+        temp = Utility.writeObjectProg("T", "add");
+        Utility.writeLine(temp, objFile);
         /*write E record to object program*/
-        temp = writeObjectProg("E", null);
-        Pass1.writeLine(temp, file3);
-        Pass1.writeLine(current, file2);
+        temp = Utility.writeObjectProg("E", null);
+        Utility.writeLine(temp, objFile);
+        Utility.writeLine(current, lstFile);
     }
 }
