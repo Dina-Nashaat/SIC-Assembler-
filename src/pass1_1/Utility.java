@@ -39,7 +39,7 @@ public class Utility {
         }
         return lines;
     }
-     
+     public static String buffer=" ";
      public static File checkFile (String Filename)
      {
         File file = new File(Filename);
@@ -66,7 +66,7 @@ public class Utility {
             Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-     public static void writeToINT(String line, File file, String locctr) {
+     public static void writeToINT(String line, File file, String locctr, boolean commentFlag) {
          
          StringBuilder newline = new StringBuilder();
         
@@ -76,8 +76,9 @@ public class Utility {
             
             newline.append(line);
             newline.append("                                                                                                ");
-            newline.insert(66, locctr);
-            
+            newline.insert(67, locctr);
+            if(commentFlag) newline.insert(66, "t");
+            else newline.insert(66, "f");
             writer.println(newline.toString());
             writer.close();
         } catch (IOException ex) {
@@ -92,10 +93,10 @@ public class Utility {
          try {
             FileWriter fw = new FileWriter(file, true);
             PrintWriter writer = new PrintWriter(fw);
-            
-            newline.append(line);
             newline.append("                                                                                                ");
-            newline.insert(66, locctr);
+            newline.insert(0, locctr);
+            newline.insert(7,Pass2.Rec);
+            newline.insert(13, line);
             
             writer.println(newline.toString());
             writer.close();
@@ -106,11 +107,12 @@ public class Utility {
      
      public static void writeTxt(File file,String stAdd,String length, String objCode)
      {
-         String buffer; 
+          
          
          buffer = "T"+stAdd+length+objCode;
          writeLine(buffer, file);
      }
+     
      
      public static String readStm(String stmt, String type) {
         type = type.toLowerCase();
