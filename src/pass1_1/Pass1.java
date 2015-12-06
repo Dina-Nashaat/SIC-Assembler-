@@ -26,7 +26,7 @@ import static pass1_1.Utility.printError;
 public class Pass1 {
 
     public static String locctr = "0";
-    public static String startAddress;
+    public static String startAddress="000000";
     public static int programLength;
     public static Hashtable symtab = new Hashtable();
 
@@ -49,8 +49,11 @@ public class Pass1 {
         
         if (Utility.readStm(line, "opcode").equals("start")) //if OPCODE = 'START' then
         {
-            startAddress = Utility.readStm(line, "operand");                                    //save #[operand] as starting address
-            locctr = startAddress;                                                               //initialize LOCCTR to starting address
+
+            int h = Utility.readStm(line, "operand").length();
+            startAddress = startAddress.substring(0, 6-h)+Utility.readStm(line, "operand");
+            locctr = startAddress;                        
+            
             Utility.writeLine(line, intFile);
             i++;
             line = lines.get(i);
@@ -64,7 +67,7 @@ public class Pass1 {
         {
             if (!isComment(line)) {                                                                       //If line is not a comment
                 if (symtab.containsKey(Utility.readStm(line, "label"))) {                       //If there is a label in the LABEL field, Search symtab for Label
-                    printError("duplicate error");                                                 //Print out Error
+                    printError("duplicate label");                                                 //Print out Error
                 } else {                                                                                           //If not
                     if (!(Utility.readStm(line, "label").equals(""))) {
                         symtab.put(Utility.readStm(line, "label"), locctr);                        //Insert Label into symtable
@@ -97,7 +100,7 @@ public class Pass1 {
                 } else {
                     printError("Invalid Operation Code");
                 }
-                Utility.writeLine(line, intFile);
+                Utility.writeToINT(line, intFile, locctr);
             }
             i++;
             line = lines.get(i);
@@ -113,6 +116,8 @@ public class Pass1 {
             programLength = Integer.parseInt(locctr, 16) - Integer.parseInt(startAddress, 16);
         } catch (NumberFormatException ex) {
         }
+        
+        Pass2.pass_2();
         /*
          System.out.println("Start Address = " + startAddress);
          System.out.println("LCCTR = " + locctr.toUpperCase());

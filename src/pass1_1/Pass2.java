@@ -11,12 +11,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
-import static pass1_1.Pass2.temp;
+//import static pass1_1.Pass2.tempObjCode;
 import pass1_1.Utility;
 import static pass1_1.Utility.addHex;
 import static pass1_1.Utility.isComment;
 import static pass1_1.Utility.printError;
-
 
 /**
  *
@@ -27,37 +26,42 @@ public class Pass2 {
     public static String progName;
     public static String opAdd;
     public static String objcode;
-    public static String temp;
-    public static String recStart;
-    public static int recLength;
-    public static int x = 0;
 
-    public static void main(String[] args) {
-        
+    public static String record = "";
+    public static String recStart;
+    public static String recLength;
+
+    public static String errorstr;
+    public static boolean error = false;
+    
+    public static void pass_2() {
+
         //Create LISTFILE and OBJFILE
-       File lstFile = Utility.checkFile("LISTFILE");
-       File objFile = Utility.checkFile("OBJFILE");
-       
+        File lstFile = Utility.checkFile("LISTFILE");
+        File objFile = Utility.checkFile("OBJFILE");
+        String locctr = "0";
         ArrayList<String> lines = new ArrayList<String>();
         lines = Utility.readAllLines("INTFILE");
-
+        int x = 0;
         int j = 0;      //Lines counter
         String current = lines.get(j);
+        int codeAdd = 0;
 
         if (Utility.readStm(current, "opcode").equals("start")) {
-            Utility.writeLine(current, lstFile);
             progName = Utility.readStm(current, "label");
+            locctr = startAddress;
             j++;
             current = lines.get(j);
+        } else {
+            errorstr = Utility.printError("No Starting Address");
+            error = true;
         }
-        else
-            Utility.printError("No Starting Address");
-
-        temp = Utility.writeObjectProg("H", null);                              //write H record in object program
-        Utility.writeLine(temp, objFile);
-        /*initialise T record*/
-        temp = Utility.writeObjectProg("T", "initialize");
-        Utility.writeLine(temp, objFile);
+        if (error == true)
+                Utility.writeToLST(current, lstFile, locctr, errorstr);
+            else
+                Utility.writeToLST(current, lstFile, locctr, null);
+        
+        Utility.writeLine(Utility.writeObjectProg("H", null, null, null), objFile);
 
         while (!Utility.readStm(current, "opcode").equals("end")) {                                     //While this is not end of program
             if (!isComment(current)) {                                                                  //If this is not a comment
@@ -75,45 +79,65 @@ public class Pass2 {
                                 opAdd = "0";
                                 Utility.printError("Undefined Symbol");
                             }
+                        } else if (Pass1.symtab.containsKey(Utility.readStm(current, "operand"))) {
+                            opAdd = (String) Pass1.symtab.get(Utility.readStm(current, "operand"));
+                            codeAdd = Integer.parseInt(OPTAB.optab.get(Utility.readStm(current, "opcode")).toString());
                         } else {
-                            if (Pass1.symtab.containsKey(Utility.readStm(current, "operand"))) {
-                                opAdd = (String) Pass1.symtab.get(Utility.readStm(current, "operand"));
-                            } else {
-                                opAdd = "0";
-                                Utility.printError("Undefined Symbol");
-                            }
+                            opAdd = "0";
+                            errorstr = Utility.printError("Undefined Symbol");
+                            error = true;
                         }
                     }
                 } else {
                     opAdd = "0";
-                    /*assemble instruction object code*/
-                    objcode = (String) OPTAB.optab.get(Utility.readStm(current, "opcode")) + opAdd;
                 }
-            } else if (Utility.readStm(current, "opcode").equals("BYTE") || Utility.readStm(current, "opcode").equals("WORD")) {
-                objcode = Utility.readStm(current, "operand");
+            } else if (Utility.readStm(current, "opcode").equals("byte") || Utility.readStm(current, "opcode").equals("word")) {
+                opAdd = "000000";
+                int h = Utility.readStm(current, "operand").length();
+                opAdd = opAdd.substring(0, 6 - h) + Utility.readStm(current, "operand");
+                codeAdd = 00;
             }
-            
-            //if (/*object code wont fit in current T record*/) {
-                /*write T record to object program*/
-              //  temp = writeObjectProg("T", "initialise");
-               // Pass1.writeLine(temp, file3);
-                //*initialise new T record*
-            //}
-            
-            /*add object code to T record*/
-            temp = Utility.writeObjectProg("T", "add");
-            Utility.writeLine(temp, objFile);
-        }
 
-        //*write listing line*
-        j++;
-        current = lines.get(j);
-        /*write last T record to object program*/
-        temp = Utility.writeObjectProg("T", "add");
-        Utility.writeLine(temp, objFile);
-        /*write E record to object program*/
-        temp = Utility.writeObjectProg("E", null);
-        Utility.writeLine(temp, objFile);
-        Utility.writeLine(current, lstFile);
+            String symAdd = Integer.toHexString(codeAdd);
+            switch (symAdd) {
+                case "0":
+                    symAdd = "00";
+                    break;
+                case "8":
+                    symAdd = "08";
+                    break;
+                case "4":
+                    symAdd = "04";
+                    break;
+                case "c":
+                    symAdd = "0c";
+                default:
+                    break;
+
+            }
+
+            String Rec = symAdd.concat(opAdd);
+            record = record.concat(Rec);
+            
+            if (record.length() == 60) {
+                recLength = Integer.toHexString(record.length());
+                Utility.writeTxt(objFile, locctr, recLength, record);                              //write H record in object program
+                record = "";
+            } 
+            if (error == true)
+                Utility.writeToLST(current, lstFile, locctr, errorstr);
+            else
+                Utility.writeToLST(current, lstFile, locctr, null);
+                
+            j++;
+            current = lines.get(j);
+            if(!(Utility.readStm(current, "opcode").equals("end")))
+                locctr = current.substring(66,70);
+            if(Utility.readStm(current, "opcode").equals("end"))
+            { recLength = Integer.toHexString(record.length());
+                Utility.writeTxt(objFile, locctr, recLength, record);
+                Utility.writeEnd(objFile,startAddress);
+            }
+        }
     }
 }

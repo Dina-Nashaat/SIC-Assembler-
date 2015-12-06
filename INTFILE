@@ -1,2 +1,16 @@
-copy     start   1000
-         rsub
+Math     START   1000
+         LDA     ALPHA                                            1003                                                    
+         ADD     inc                                              1006                                                  
+         SUB     ONE                                              1009                                                  
+         STA     BETA                                             100c                                                   
+         LDA     GAMMA                                            100f                                                    
+         ADD     inc                                              1012                                                  
+         SUB     ONE                                              1015                                                  
+         STA     DELTA                                            1018                                                    
+ALPHA    WORD    5                                                101b                                                
+GAMMA    WORD    6                                                101e                                                
+inc      WORD    4                                                1021                                                
+ONE      WORD    1                                                1024                                                
+BETA     RESW    1                                                1027                                                
+DELTA    RESW    1                                                102a                                                
+         END     Math

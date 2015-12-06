@@ -1,0 +1,9 @@
+
+        //*write listing line*
+        /*write last T record to object program*/
+        tempObjCode = Utility.writeObjectProg("T", "add",null,null);
+        Utility.writeLine(tempObjCode, objFile);
+        /*write E record to object program*/
+        tempObjCode = Utility.writeObjectProg("E", null,null,null);
+        Utility.writeLine(tempObjCode, objFile);
+        Utility.writeLine(current, lstFile);
