@@ -3,14 +3,14 @@ Math     START   1000                                             t null
          ADD     inc                                              f 001003                                                 
          SUB     ONE                                              f 001006                                                 
          STA     BETA                                             f 001009                                                  
-         LDA     GAMMA                                            f 00100c                                                   
-         ADD     inc                                              f 00100f                                                 
+         LDA     GAMMA                                            f 00100C                                                   
+         ADD     inc                                              f 00100F                                                 
          SUB     ONE                                              f 001012                                                 
          STA     DELTA                                            f 001015                                                   
 ALPHA    WORD    5                                                f 001018                                               
-GAMMA    WORD    6                                                f 00101b                                               
-inc      WORD    4                                                f 00101e                                               
+GAMMA    WORD    6                                                f 00101B                                               
+inc      WORD    4                                                f 00101E                                               
 ONE      WORD    1                                                f 001021                                               
 GAMMA    RESW    1                                                f 001024                                               
 DELTA    RESW    1                                                f 001027                                               
-         END     Math                                             f 00102a                                                  
+         END     Math                                             f 00102A                                                  

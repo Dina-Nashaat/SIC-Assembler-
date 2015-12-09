@@ -6,16 +6,11 @@
 package pass1_1;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
 //import static pass1_1.Pass2.tempObjCode;
-import pass1_1.Utility;
 import static pass1_1.Utility.addHex;
 import static pass1_1.Utility.isComment;
-import static pass1_1.Utility.printError;
 
 /**
  *
@@ -26,52 +21,56 @@ public class Pass2 {
     public static String progName;
     public static String opAdd;
     public static String objcode;
-
+    public static String current;
     public static String record = "";
-    public static String recStart;
+    public static String recStart = "0";
     public static String recLength;
-    public static String Rec;
+    public static String Rec = "000000";
+    public static String counter;
     public static String errorstr;
     public static boolean error = false;
-    public static String SA;
 
     public static void pass_2() {
 
         //Create LISTFILE and OBJFILE
         File lstFile = Utility.checkFile("LISTFILE");
         File objFile = Utility.checkFile("OBJFILE");
-        String locctr = "0";
+        counter = "0";
         ArrayList<String> lines = new ArrayList<String>();
         lines = Utility.readAllLines("INTFILE");
-        int x = 0;
-        int j = 0;      //Lines counter
-        String current = lines.get(j);
         int codeAdd = 0;
+        int x = 0;
+        int j = 0;      //Lines counter      
+        current = lines.get(j);
 
         if (Utility.readStm(current, "opcode").equals("start")) {
             progName = Utility.readStm(current, "label");
-            locctr = startAddress;
-            SA = locctr;
-//            j++;
-            //          current = lines.get(j);
+            counter = startAddress;
+            recStart = counter;
+            //j++;
+            //current = lines.get(j);
         } else {
             errorstr = Utility.printError("No Starting Address");
             error = true;
         }
         if (error == true) {
-            Utility.writeToLST(current, lstFile, locctr, errorstr);
+            Utility.writeToLST(current, lstFile, counter, errorstr);
         } else {
-            Utility.writeToLST(current, lstFile, locctr, null);
+            Utility.writeToLST(current, lstFile, counter, null);
         }
 
         Utility.writeLine(Utility.writeObjectProg("H", null, null, null), objFile);
-        while (!Utility.readStm(current, "opcode").equals("end")) {                                     //While this is not end of program
+        j++;
+        current = lines.get(j);
+        counter = current.substring(68, 74);
+
+        while (!Utility.readStm(current, "opcode").equals("end")) {                    //While this is not end of program
             if (!isComment(current)) {                                                                  //If this is not a comment
-                if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                      //Search optab for opcode
+                if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                //Search optab for opcode
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
                     } else if (Utility.readStm(current, "operand") != "") {
-                        if (Utility.readStm(current, "operand").contains(",")) {                                //Indexing
+                        if (Utility.readStm(current, "operand").contains(",")) {                             //Indexing
                             int cut = Utility.readStm(current, "operand").indexOf(",");
                             String operand = Utility.readStm(current, "operand").substring(0, cut - 1);
                             if (Pass1.symtab.containsKey(operand)) {
@@ -98,7 +97,6 @@ public class Pass2 {
                 opAdd = "000000";
                 int h = Utility.readStm(current, "operand").length();
                 opAdd = opAdd.substring(0, 6 - h) + Utility.readStm(current, "operand");
-                
             }
 
             String symAdd = Integer.toHexString(codeAdd);
@@ -123,29 +121,29 @@ public class Pass2 {
             record = record.concat(Rec);
 
             if (record.length() == 60) {
-                Integer inputDec = Integer.parseInt(locctr, 16);
-                inputDec = (inputDec-1) - (Integer.parseInt(SA));
+                Integer inputDec = Integer.parseInt(counter, 16);
+                inputDec = (inputDec - 1) - (Integer.parseInt(recStart));
                 String outputHex = Integer.toHexString(inputDec);
-                Utility.writeTxt(objFile, SA, outputHex, record);                              //write H record in object program
+                Utility.writeTxt(objFile, recStart, outputHex, record);                              //write H record in object program
                 record = "";
-                SA = locctr;
+                recStart = counter;
             }
+
             if (error == true) {
-                Utility.writeToLST(current, lstFile, locctr, errorstr);
+                Utility.writeToLST(current, lstFile, counter, errorstr);
             } else {
-                Utility.writeToLST(current, lstFile, locctr, null);
+                Utility.writeToLST(current, lstFile, counter, null);
             }
 
             j++;
             current = lines.get(j);
-            if (!(Utility.readStm(current, "opcode").equals("end"))) {
-                locctr = current.substring(68, 74);
-            }
-            if (Utility.readStm(current, "opcode").equals("end")) {
-                recLength = Integer.toHexString(record.length());
-                Utility.writeTxt(objFile, locctr, recLength, record);
-                Utility.writeEnd(objFile, startAddress);
-            }
+            counter = current.substring(68, 74);
+
+        }
+        if (Utility.readStm(current, "opcode").equals("end")) {
+            recLength = Integer.toHexString(record.length());
+            Utility.writeTxt(objFile, counter, recLength, record);
+            Utility.writeEnd(objFile, startAddress);
         }
     }
 }

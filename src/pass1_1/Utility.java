@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
+import static pass1_1.Pass2.Rec;
 import static pass1_1.Pass2.objcode;
 import static pass1_1.Pass2.progName;
 import static pass1_1.Pass2.recLength;
@@ -26,8 +27,8 @@ import static pass1_1.Pass2.recStart;
  * @author dinan
  */
 public class Utility {
-    
-     public static ArrayList readAllLines(String filename) {
+
+    public static ArrayList readAllLines(String filename) {
         ArrayList<String> lines = new ArrayList<String>();
         try {
             Scanner s = new Scanner(new File(filename));
@@ -39,9 +40,9 @@ public class Utility {
         }
         return lines;
     }
-     public static String buffer=" ";
-     public static File checkFile (String Filename)
-     {
+    public static String buffer = " ";
+
+    public static File checkFile(String Filename) {
         File file = new File(Filename);
         if (file.exists()) {
             file.delete();
@@ -53,9 +54,9 @@ public class Utility {
             }
         }
         return file;
-     }
-     
-     public static void writeLine(String line, File file) {
+    }
+
+    public static void writeLine(String line, File file) {
 
         try {
             FileWriter fw = new FileWriter(file, true);
@@ -66,83 +67,87 @@ public class Utility {
             Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-     public static void writeToINT(String line, File file, String locctr, boolean commentFlag) {
-         
-         StringBuilder newline = new StringBuilder();
-        
-         try {
+
+    public static void writeToINT(String line, File file, String locctr, boolean commentFlag) {
+
+        StringBuilder newline = new StringBuilder();
+
+        try {
             FileWriter fw = new FileWriter(file, true);
             PrintWriter writer = new PrintWriter(fw);
-            
+
             newline.append(line);
             newline.append("                                                                                                ");
             newline.insert(67, locctr);
-            if(commentFlag) newline.insert(66, "t");
-            else newline.insert(66, "f");
+            if (commentFlag) {
+                newline.insert(66, "t");
+            } else {
+                newline.insert(66, "f");
+            }
             writer.println(newline.toString());
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-     
-     public static void writeToLST(String line, File file, String locctr, String error) {
-         
-         StringBuilder newline = new StringBuilder();
-        
-         try {
+
+    public static void writeToLST(String line, File file, String locctr, String error) {
+
+        StringBuilder newline = new StringBuilder();
+
+        try {
             FileWriter fw = new FileWriter(file, true);
             PrintWriter writer = new PrintWriter(fw);
             newline.append("                                                                                                ");
             newline.insert(0, locctr);
-            newline.insert(7,Pass2.Rec);
-            newline.insert(13, line);
-            
+            newline.insert(7, Pass2.Rec);
+            newline.insert(14, line);
+
             writer.println(newline.toString());
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Pass1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-     
-     public static void writeTxt(File file,String stAdd,String length, String objCode)
-     {
-          
-         
-         buffer = "T"+stAdd+length+objCode;
-         writeLine(buffer, file);
-     }
-     
-     
-     public static String readStm(String stmt, String type) {
+
+    public static void writeTxt(File file, String stAdd, String length, String objCode) {
+        buffer = "T" + stAdd + length + objCode;
+        writeLine(buffer, file);
+    }
+
+    public static String readStm(String stmt, String type) {
         type = type.toLowerCase();
-        int start, end=stmt.length();
-        
+        int start, end = stmt.length();
+
         switch (type) {
             case "label":
-                if (stmt.substring(0,7).contains("      "))
+                if (stmt.substring(0, 7).contains("      ")) {
                     return "";
-                else if(stmt.substring(0, 7).startsWith(" "))
+                } else if (stmt.substring(0, 7).startsWith(" ")) {
                     return printError("Invalid Label String");
+                }
                 start = 0;
                 end = 7;
                 break;
             case "opcode":
-                if (stmt.substring(9,stmt.length()).startsWith(" "))
-                   return printError("Invalid opcode String");
+                if (stmt.substring(9, stmt.length()).startsWith(" ")) {
+                    return printError("Invalid opcode String");
+                }
                 start = 9;
-                if(stmt.length()<14)
+                if (stmt.length() < 14) {
                     end = stmt.length();
-                else end = 14;
+                } else {
+                    end = 14;
+                }
                 break;
             case "operand":
-                if (stmt.substring(17,stmt.length()).startsWith(" "))
+                if (stmt.substring(17, stmt.length()).startsWith(" ")) {
                     return printError("Invalid operand String");
+                }
                 start = 17;
-                if(stmt.length()<=34)
+                if (stmt.length() <= 34) {
                     end = stmt.length();
-                else 
-                { 
+                } else {
                     end = 34;
                 }
 
@@ -156,7 +161,7 @@ public class Utility {
         String trgStm = stmt.substring(start, end).trim().toLowerCase();
         return trgStm;
     }
-     
+
     public static String addHex(String inputHex, int i) {
         Integer inputDec = Integer.parseInt(inputHex, 16);
         inputDec += i;
@@ -178,7 +183,7 @@ public class Utility {
     }
 
     public static String printError(String errormessage) {
-        switch(errormessage){
+        switch (errormessage) {
             case "Undefined Symbol":
                 return "Undefined Symbol";
             case "No Starting Address":
@@ -195,20 +200,20 @@ public class Utility {
                 return null;
         }
     }
-    
-    public static String writeObjectProg(String type, String order, String oprAdd,String codeAdd) {
-        String line = null;            
+
+    public static String writeObjectProg(String type, String order, String oprAdd, String codeAdd) {
+        String line = null;
         String progLength = "000000";
-        int h =  Integer.toHexString(programLength).toString().length();
-        progLength = progLength.substring(0,6-h)+ Integer.toHexString(programLength);
+        int h = Integer.toHexString(programLength).toString().length();
+        progLength = progLength.substring(0, 6 - h) + Integer.toHexString(programLength);
         switch (type) {
             case "H":
-                line = "H" + Pass2.progName + startAddress +progLength;
+                line = "H" + Pass2.progName + startAddress.toUpperCase() + progLength.toUpperCase();
                 break;
             case "T":
                 switch (order) {
                     case "initialize":
-                        line = "T" + recStart + recLength + objcode;
+                        line = "T" + recStart + recLength + Rec;
                         break;
                     case "add":
                         line = codeAdd + oprAdd;
@@ -223,12 +228,11 @@ public class Utility {
         }
         return line;
     }
-    
-    public static void writeEnd(File file, String stAdd)
-    {
-         String buffer;  
-         buffer = "E"+stAdd;
-         writeLine(buffer, file);   
-    
+
+    public static void writeEnd(File file, String stAdd) {
+        String buffer;
+        buffer = "E" + stAdd;
+        writeLine(buffer, file);
+
     }
 }
