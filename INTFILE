@@ -1,5 +1,5 @@
 Math     START   1000                                             t null                                                  
-         LDA      ALPHA                                           f 001000                                                    
+         LDA     ALPHA                                            f 001000                                                   
          ADD     inc                                              f 001003                                                 
          SUB     ONE                                              f 001006                                                 
          STA     BETA                                             f 001009                                                  
@@ -9,8 +9,8 @@ Math     START   1000                                             t null
          STA     DELTA                                            f 001015                                                   
 ALPHA    WORD    5                                                f 001018                                               
 GAMMA    WORD    6                                                f 00101B                                               
-inc      WORD    4                                                f 00101E                                               
+inc      WORD    12                                               f 00101E                                                
 ONE      WORD    1                                                f 001021                                               
-GAMMA    RESW    1                                                f 001024                                               
+BETA     RESW    1                                                f 001024                                               
 DELTA    RESW    1                                                f 001027                                               
          END     Math                                             f 00102A                                                  

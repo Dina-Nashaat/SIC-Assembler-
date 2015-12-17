@@ -17,8 +17,6 @@ import java.util.logging.Logger;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass2.Rec;
-import static pass1_1.Pass2.objcode;
-import static pass1_1.Pass2.progName;
 import static pass1_1.Pass2.recLength;
 import static pass1_1.Pass2.recStart;
 
@@ -40,6 +38,7 @@ public class Utility {
         }
         return lines;
     }
+    
     public static String buffer = " ";
 
     public static File checkFile(String Filename) {
@@ -100,7 +99,7 @@ public class Utility {
             PrintWriter writer = new PrintWriter(fw);
             newline.append("                                                                                                ");
             newline.insert(0, locctr);
-            newline.insert(7, Pass2.Rec);
+            newline.insert(7, Pass2.Rec.toUpperCase());
             newline.insert(14, line);
 
             writer.println(newline.toString());
@@ -112,7 +111,7 @@ public class Utility {
 
     public static void writeTxt(File file, String stAdd, String length, String objCode) {
         buffer = "T" + stAdd + length + objCode;
-        writeLine(buffer, file);
+        writeLine(buffer.toUpperCase(), file);
     }
 
     public static String readStm(String stmt, String type) {
@@ -145,12 +144,11 @@ public class Utility {
                     return printError("Invalid operand String");
                 }
                 start = 17;
-                if (stmt.length() <= 34) {
+                if (stmt.length() < 34) {
                     end = stmt.length();
                 } else {
                     end = 34;
                 }
-
                 break;
             case "comment":
                 start = 35;
@@ -205,10 +203,10 @@ public class Utility {
         String line = null;
         String progLength = "000000";
         int h = Integer.toHexString(programLength).toString().length();
-        progLength = progLength.substring(0, 6 - h) + Integer.toHexString(programLength);
+        progLength = (progLength.substring(0, 6 - h) + Integer.toHexString(programLength)).toUpperCase();
         switch (type) {
             case "H":
-                line = "H" + Pass2.progName + startAddress.toUpperCase() + progLength.toUpperCase();
+                line = "H" + Pass2.progName + " " + startAddress.toUpperCase() + progLength.toUpperCase();
                 break;
             case "T":
                 switch (order) {
@@ -231,7 +229,7 @@ public class Utility {
 
     public static void writeEnd(File file, String stAdd) {
         String buffer;
-        buffer = "E" + stAdd;
+        buffer = "E" + stAdd.toUpperCase();
         writeLine(buffer, file);
 
     }

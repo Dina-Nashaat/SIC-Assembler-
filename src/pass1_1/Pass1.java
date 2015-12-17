@@ -6,16 +6,8 @@
 package pass1_1;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import pass1_1.Utility.*;
 import static pass1_1.Utility.addHex;
 import static pass1_1.Utility.isComment;
 import static pass1_1.Utility.printError;
