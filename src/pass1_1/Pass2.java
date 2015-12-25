@@ -73,18 +73,13 @@ public class Pass2 {
 
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
-                    } else if (Utility.readStm(current, "operand").startsWith("="))
+                    }
+                    else if (Utility.readStm(current, "operand").startsWith("="))
                     {
                         String op = Utility.checkLiterals(current);
                         opAdd = Pass1.littab.get(op);
                         
-                    } else if (Utility.readStm(current, "label").startsWith("*"))
-                    {
-                        String op = Utility.checkLiterals2(current);
-                        symAdd = null;
-                        opAdd = Utility.asciiToHex(op);
-                        
-                    }
+                    } 
                     else if (Utility.readStm(current, "operand") != "") {
                         if (Utility.readStm(current, "operand").contains(",")) {                             //Indexing
                             int cut = Utility.readStm(current, "operand").indexOf(",");
@@ -106,6 +101,7 @@ public class Pass2 {
                             error = true;
                         }
                     }
+                    
 
                     codeAdd = (int) OPTAB.optab.get(Utility.readStm(current, "opcode"));
                     String y = "00";
@@ -113,7 +109,14 @@ public class Pass2 {
                     int h = w.length();
                     symAdd = y.substring(0, 2 - h) + w;
 
-                } else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
+                }else if (Utility.readStm(current, "label").startsWith("/*"))
+                    {
+                        String op = Utility.checkLiterals2(current);
+                        symAdd = null;
+                        opAdd = Utility.asciiToHex(op);
+                        
+                    } 
+                else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
                     String res = null;
                     int result = 0;
 

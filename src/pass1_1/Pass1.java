@@ -72,15 +72,19 @@ public class Pass1 {
                 Enumeration<String> enumKey = littab.keys();
                 while (enumKey.hasMoreElements()) {
                     String key = enumKey.nextElement();
+                    if(done.contains(key)) break;
                     //String val = littab.get(key);
-                    line = "*       " + "=" + "C'"+op+"'";
-                    Utility.writeToINT(line, intFile, locctr, isCommentflag);
+                    line = "*       " + "=" + "C'"+key+"'";
+                    int h = locctr.length();
+                    address = address.substring(0, 6 - h) + locctr;
+                    Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
+                    done.add(key);
+                    
                     littab.put(key, locctr);
                     locctr = locctr + key.length();
                     }
                 }
-
-            }
+            
 
             Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
 
@@ -169,6 +173,20 @@ public class Pass1 {
                 isCommentflag = true;
             }
         }
+        Enumeration<String> enumKey = littab.keys();
+        while (enumKey.hasMoreElements()) {
+                    String key = enumKey.nextElement();
+                    if(done.contains(key)) break;
+                    //String val = littab.get(key);
+                    line = "*       " + "=" + "C'"+key+"'";
+                    int h = locctr.length();
+                    address = address.substring(0, 6 - h) + locctr;
+                    Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
+                    done.add(key);
+                    
+                    littab.put(key, locctr);
+                    locctr = locctr + key.length();
+                    }
 
         if (Utility.readStm(line, "opcode").equals("end")) {
             address = "000000";
