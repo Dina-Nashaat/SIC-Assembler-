@@ -11,9 +11,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass2.Rec;
@@ -218,4 +221,29 @@ public class Utility {
         writeLine(buffer, file);
 
     }
+    
+    public static String checkLiterals(String line)
+    {
+        boolean HexFlag;
+        String operand, op;
+        op = "";
+        operand = readStm(line,"operand");
+        if(operand.startsWith("="))
+        {
+            operand = operand.substring(1);
+            if(operand.startsWith("X"))
+                HexFlag = true;
+            else HexFlag = false;
+            
+            Pattern p = Pattern.compile("\'([^\']*)\'");
+            Matcher m = p.matcher(operand);
+            while (m.find())
+                op = m.group(1);            
+            return op;
+        }
+        else 
+            return null;
+    }
+    
+    
 }
