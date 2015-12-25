@@ -109,7 +109,7 @@ public class Pass2 {
                     int h = w.length();
                     symAdd = y.substring(0, 2 - h) + w;
 
-                }else if (Utility.readStm(current, "label").startsWith("/*"))
+                }else if (Utility.readStm(current, "label").startsWith("*"))
                     {
                         String op = Utility.checkLiterals2(current);
                         symAdd = null;
