@@ -76,7 +76,7 @@ public class Utility {
             PrintWriter writer = new PrintWriter(fw);
 
             newline.append(line);
-            newline.append("                                                                                                ");
+            newline.append("                                                                                      ");
             newline.insert(67, locctr);
             if (commentFlag) {
                 newline.insert(66, "t");
@@ -181,22 +181,7 @@ public class Utility {
     }
 
     public static String printError(String errormessage) {
-        switch (errormessage) {
-            case "Undefined Symbol":
-                return "Undefined Symbol";
-            case "No Starting Address":
-                return "No Starting Address";
-            case "Invalid Operator":
-                return "Invalid Operator";
-            case "Invalid Operation Code":
-                return "Invalid Operation Code";
-            case "duplicate label":
-                return "duplicate label";
-            case "Undefined Record":
-                return "Undefined Record";
-            default:
-                return null;
-        }
+        return errormessage;
     }
 
     public static String writeObjectProg(String type, String order, String oprAdd, String codeAdd) {

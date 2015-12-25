@@ -2,15 +2,17 @@
 Math     START   1000
          LDA     ALPHA
          ADD     inc
+value    equ     *
          SUB     ONE
          STA     BETA
+MAXLEN   EQU     alpha-value
          LDA     GAMMA
-         ADD     inc
+         ADD     INC
          SUB     ONE
          STA     DELTA
 ALPHA    WORD    5
 GAMMA    WORD    6
-inc      WORD    12
+INC      WORD    12
 ONE      WORD    1
 BETA     RESW    1
 DELTA    RESW    1
