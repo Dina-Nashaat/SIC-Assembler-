@@ -73,7 +73,19 @@ public class Pass2 {
 
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
-                    } else if (Utility.readStm(current, "operand") != "") {
+                    } else if (Utility.readStm(current, "operand").startsWith("="))
+                    {
+                        String op = Utility.checkLiterals(current);
+                        opAdd = Pass1.littab.get(op);
+                        
+                    } else if (Utility.readStm(current, "label").startsWith("*"))
+                    {
+                        String op = Utility.checkLiterals2(current);
+                        symAdd = null;
+                        opAdd = Utility.asciiToHex(op);
+                        
+                    }
+                    else if (Utility.readStm(current, "operand") != "") {
                         if (Utility.readStm(current, "operand").contains(",")) {                             //Indexing
                             int cut = Utility.readStm(current, "operand").indexOf(",");
                             String operand = Utility.readStm(current, "operand").substring(0, cut - 1);

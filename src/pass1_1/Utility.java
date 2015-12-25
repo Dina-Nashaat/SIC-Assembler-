@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
@@ -41,7 +42,7 @@ public class Utility {
         }
         return lines;
     }
-    
+
     public static String buffer = " ";
 
     public static File checkFile(String Filename) {
@@ -221,29 +222,56 @@ public class Utility {
         writeLine(buffer, file);
 
     }
-    
-    public static String checkLiterals(String line)
-    {
+
+    public static String checkLiterals(String line) {
         boolean HexFlag;
         String operand, op;
         op = "";
-        operand = readStm(line,"operand");
-        if(operand.startsWith("="))
-        {
+        operand = readStm(line, "operand");
+        if (operand.startsWith("=")) {
             operand = operand.substring(1);
-            if(operand.startsWith("X"))
+            if (operand.startsWith("X")) {
                 HexFlag = true;
-            else HexFlag = false;
-            
+            } else {
+                HexFlag = false;
+            }
+
             Pattern p = Pattern.compile("\'([^\']*)\'");
             Matcher m = p.matcher(operand);
-            while (m.find())
-                op = m.group(1);            
+            while (m.find()) {
+                op = m.group(1);
+            }
             return op;
-        }
-        else 
+        } else {
             return null;
+        }
     }
-    
-    
+
+    public static String checkLiterals2(String line) {
+        boolean HexFlag;
+        String operand, op;
+        op = "";
+        operand = readStm(line, "opcode");
+        if (operand.startsWith("=")) {
+            operand = operand.substring(1);
+            Pattern p = Pattern.compile("\'([^\']*)\'");
+            Matcher m = p.matcher(operand);
+            while (m.find()) {
+                op = m.group(1);
+            }
+            return op;
+        } else {
+            return null;
+        }
+    }
+
+    public static String asciiToHex(String asciiValue) {
+        char[] chars = asciiValue.toCharArray();
+        StringBuffer hex = new StringBuffer();
+        for (int i = 0; i < chars.length; i++) {
+            hex.append(Integer.toHexString((int) chars[i]));
+        }
+        return hex.toString();
+    }
+
 }
