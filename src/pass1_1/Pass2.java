@@ -180,11 +180,6 @@ public class Pass2 {
 
             if (Utility.readStm(current, "opcode").equals("end")) {
                 String s = "00";
-                /*
-                 recLength = Integer.toHexString(record.length());
-                 int g = recLength.length();
-                 recLength = s.substring(0, 2 - g) + recLength;
-                 */
                 int current_address = Integer.parseInt(counter, 16);
                 int record_start = Integer.parseInt(recStart, 16);
                 int record_length = (current_address - record_start + 3) / 2;
@@ -204,6 +199,8 @@ public class Pass2 {
             String op = Utility.checkLiterals(current, "literal");
             symAdd = "";
             opAdd = Utility.asciiToHex(op);
+               Rec = symAdd.concat(opAdd);
+                record = record.concat(Rec);
             if (error == true) {
                 Utility.writeToLST(current, lstFile, counter, errorstr);
             } else {
@@ -214,7 +211,9 @@ public class Pass2 {
                 current = "";
                 break;
             }
+
         }
+        
 
     }
 }
