@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -18,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.bind.DatatypeConverter;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass2.Rec;
@@ -155,7 +157,7 @@ public class Utility {
                 } else {
                     end = 34;
                 }
-                 trgStm = stmt.substring(start, end).trim().toLowerCase();
+                trgStm = stmt.substring(start, end).trim().toLowerCase();
                 break;
             case "comment":
                 start = 35;
@@ -169,7 +171,7 @@ public class Utility {
                 } else {
                     end = 16;
                 }
-                 trgStm = stmt.substring(start, end).trim();
+                trgStm = stmt.substring(start, end).trim();
                 break;
             case "operandliteral":
                 if (stmt.substring(17, stmt.length()).startsWith(" ")) {
@@ -181,12 +183,12 @@ public class Utility {
                 } else {
                     end = 34;
                 }
-                 trgStm = stmt.substring(start, end).trim();
-                 break;
+                trgStm = stmt.substring(start, end).trim();
+                break;
             default:
                 return printError("unidentified operation");
         }
-        
+
         return trgStm;
     }
 
@@ -252,11 +254,11 @@ public class Utility {
     public static String checkLiterals(String line, String type) {
         boolean HexFlag;
 
-        String operand="", op;
+        String operand = "", op;
         op = "";
         Pattern p = Pattern.compile("\'([^\']*)\'");
         Matcher m = p.matcher(operand);
-            
+
         switch (type) {
             case "operand":
                 operand = readStm(line, "operandLiteral");
@@ -270,13 +272,6 @@ public class Utility {
                 break;
         }
         if (operand.startsWith("=")) {
-            operand = operand.substring(1);
-            if (operand.startsWith("X")) {
-                HexFlag = true;
-            } else {
-                HexFlag = false;
-            }
-            
             while (m.find()) {
                 op = m.group(1);
             }
@@ -293,6 +288,48 @@ public class Utility {
             hex.append(Integer.toHexString((int) chars[i]));
         }
         return hex.toString();
+    }
+
+    public static String lhexToAscii(String hexValue) throws UnsupportedEncodingException {
+        byte[] bytes = DatatypeConverter.parseHexBinary(hexValue);
+        String result = new String(bytes, "UTF-8");
+        return result;
+
+    }
+    
+    public static String hexToAscii(String hex){
+
+	  StringBuilder sb = new StringBuilder();
+	  StringBuilder temp = new StringBuilder();
+	  
+	  //49204c6f7665204a617661 split into two characters 49, 20, 4c...
+	  for( int i=0; i<hex.length()-1; i+=2 ){
+		  
+	      //grab the hex in pairs
+	      String output = hex.substring(i, (i + 2));
+	      //convert hex to decimal
+	      int decimal = Integer.parseInt(output, 16);
+	      //convert the decimal to character
+	      sb.append((char)decimal);
+		  
+	      temp.append(decimal);
+	  }
+	  //System.out.println("Decimal : " + );
+	  
+	  return sb.toString();
+  }
+    
+    
+    public static boolean checkHex (String line, String Type)
+    {
+        String operand = "";
+        operand = readStm(line, "operandLiteral");
+        operand = operand.substring(1);
+            if (operand.startsWith("X")) {
+                return true;
+            } else {
+                return false;
+            }
     }
 
 }

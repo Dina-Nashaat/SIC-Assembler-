@@ -6,6 +6,7 @@
 package pass1_1;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass1.symtab;
@@ -33,7 +34,7 @@ public class Pass2 {
     public static String errorstr;
     public static boolean error = false;
 
-    public static void pass_2() {
+    public static void pass_2() throws UnsupportedEncodingException {
 
         //Create LISTFILE and OBJFILE
         File lstFile = Utility.checkFile("LISTFILE");
@@ -75,7 +76,12 @@ public class Pass2 {
                         opAdd = Utility.readStm(current, "operand").substring(1);
                     } else if (Utility.readStm(current, "operandLiteral").startsWith("=")) {
                         String op = Utility.checkLiterals(current, "operand");
-                        opAdd = Pass1.littab.get(op);
+                        Boolean isHex = Utility.checkHex(current, "operand");
+                        if(isHex) op = Utility.lhexToAscii(op);
+                        ArrayList list = new ArrayList();
+                        list = Pass1.littab.get(op);
+                        
+                        opAdd = (String)list.get(0);
 
                     } else if (Utility.readStm(current, "operand") != "") {
                         if (Utility.readStm(current, "operand").contains(",")) {                             //Indexing

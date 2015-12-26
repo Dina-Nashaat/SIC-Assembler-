@@ -2,10 +2,10 @@
 Math     START   1000
          LDA     ALPHA
          ADD     inc
-value    equ     *
+         LDA     =X'454f46'
+         LDA     =C'EOF'
          SUB     ONE
          STA     BETA
-MAXLEN   EQU     alpha-value
          LDA     GAMMA
          ADD     INC
          SUB     ONE

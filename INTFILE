@@ -1,18 +1,19 @@
 Math     START   1000                                             t 001000                                        
          LDA     ALPHA                                            f 001000                                         
          ADD     inc                                              f 001003                                       
-value    equ     *                                                f 001006                                     
-         SUB     ONE                                              f 001006                                       
-         STA     BETA                                             f 001009                                        
-MAXLEN   EQU     alpha-value                                      f 00100C                                               
-         LDA     GAMMA                                            f 00100C                                         
-         ADD     INC                                              f 00100F                                       
-         SUB     ONE                                              f 001012                                       
-         STA     DELTA                                            f 001015                                         
-ALPHA    WORD    5                                                f 001018                                     
-GAMMA    WORD    6                                                f 00101B                                     
-INC      WORD    12                                               f 00101E                                      
-ONE      WORD    1                                                f 001021                                     
-BETA     RESW    1                                                f 001024                                     
-DELTA    RESW    1                                                f 001027                                     
-         END     Math                                             f 00102A                                        
+         LDA     =X'454f46'                                       f 001006                                              
+         LDA     =C'EOF'                                          f 001009                                           
+         SUB     ONE                                              f 00100C                                       
+         STA     BETA                                             f 00100F                                        
+         LDA     GAMMA                                            f 001012                                         
+         ADD     INC                                              f 001015                                       
+         SUB     ONE                                              f 001018                                       
+         STA     DELTA                                            f 00101B                                         
+ALPHA    WORD    5                                                f 00101E                                     
+GAMMA    WORD    6                                                f 001021                                     
+INC      WORD    12                                               f 001024                                      
+ONE      WORD    1                                                f 001027                                     
+BETA     RESW    1                                                f 00102A                                     
+DELTA    RESW    1                                                f 00102D                                     
+         END     Math                                             f 001030                                        
+*       =X'454f46'                                                f 001030                                     

@@ -6,11 +6,13 @@
 package pass1_1;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import static pass1_1.Utility.addHex;
+import static pass1_1.Utility.hexToAscii;
 import static pass1_1.Utility.isComment;
 import static pass1_1.Utility.printError;
 
@@ -25,11 +27,11 @@ public class Pass1 {
     public static int programLength;
     public static String address = "000000";
     public static Hashtable symtab = new Hashtable();
-    public static Hashtable<String,String> littab = new Hashtable();
+    public static Hashtable<String,ArrayList> littab = new Hashtable();
     public static List done = new ArrayList();
     public static boolean isCommentflag = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
 
         //Create new File
         File intFile = Utility.checkFile("INTFILE");
@@ -65,22 +67,33 @@ public class Pass1 {
         while (!Utility.readStm(line, "opcode").equals("end")) //while OPCODE != END
         {
             String op = Utility.checkLiterals(line,"operand");
+            Boolean isHex = Utility.checkHex(line, "operand");
             if (op != null) {
-                littab.put(op, "0");
+                if(isHex) {op = Utility.lhexToAscii(op);}
+                ArrayList litVal = new ArrayList();
+                litVal.add(0, op);
+                litVal.add(1,isHex);
+                if(!(littab.containsKey(op)))
+                {
+                    littab.put(op, litVal);
+                }
             }
             if (Utility.readStm(line, "opcode").equals("LTORG")) {
                 Enumeration<String> enumKey = littab.keys();
                 while (enumKey.hasMoreElements()) {
                     String key = enumKey.nextElement();
+                    ArrayList val = littab.get(key);
                     if(done.contains(key)) break;
-                    //String val = littab.get(key);
-                    line = "*       " + "=" + "C'"+key+"'";
+                    boolean isHexD =(boolean) val.get(1);
+                    if(isHexD) line = "*       " + "=" + "X'"+hexToAscii(key)+"'";
+                    else line = "*       " + "=" + "C'"+key+"'";
                     int h = locctr.length();
                     address = address.substring(0, 6 - h) + locctr;
                     Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
                     done.add(key);
+                    val.add(0, locctr);
                     
-                    littab.put(key, locctr);
+                    littab.put(key, val);
                     locctr = locctr + key.length();
                     }
                 }
@@ -183,14 +196,15 @@ public class Pass1 {
         while (enumKey.hasMoreElements()) {
                     String key = enumKey.nextElement();
                     if(done.contains(key)) break;
-                    //String val = littab.get(key);
-                    line = "*       " + "=" + "C'"+key+"'";
+                    ArrayList val = littab.get(key);
+                    boolean isHexD =(boolean) val.get(1);
+                    if(isHexD) line = "*       " + "=" + "X'"+Utility.asciiToHex(key)+"'";
+                    else line = "*       " + "=" + "C'"+key+"'";
                     int h = locctr.length();
                     address = address.substring(0, 6 - h) + locctr;
                     Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
                     done.add(key);
-                    
-                    littab.put(key, locctr);
+                    littab.put(key, val);
                     locctr = locctr + key.length();
                     }
 
