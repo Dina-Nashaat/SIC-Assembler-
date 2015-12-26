@@ -171,7 +171,7 @@ public class Utility {
                 }
                  trgStm = stmt.substring(start, end).trim();
                 break;
-            case "operandLiteral":
+            case "operandliteral":
                 if (stmt.substring(17, stmt.length()).startsWith(" ")) {
                     return printError("Invalid operand String");
                 }
@@ -182,6 +182,7 @@ public class Utility {
                     end = 34;
                 }
                  trgStm = stmt.substring(start, end).trim();
+                 break;
             default:
                 return printError("unidentified operation");
         }
@@ -258,7 +259,7 @@ public class Utility {
             
         switch (type) {
             case "operand":
-                operand = readStm(line, "operand");
+                operand = readStm(line, "operandLiteral");
                 p = Pattern.compile("\'([^\']*)\'");
                 m = p.matcher(operand);
                 break;

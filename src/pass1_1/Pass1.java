@@ -173,6 +173,12 @@ public class Pass1 {
                 isCommentflag = true;
             }
         }
+        if (Utility.readStm(line, "opcode").equals("end")) {
+            address = "000000";
+            int h = locctr.length();
+            address = address.substring(0, 6 - h) + locctr;
+            Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
+        }
         Enumeration<String> enumKey = littab.keys();
         while (enumKey.hasMoreElements()) {
                     String key = enumKey.nextElement();
@@ -188,12 +194,6 @@ public class Pass1 {
                     locctr = locctr + key.length();
                     }
 
-        if (Utility.readStm(line, "opcode").equals("end")) {
-            address = "000000";
-            int h = locctr.length();
-            address = address.substring(0, 6 - h) + locctr;
-            Utility.writeToINT(line, intFile, address.toUpperCase(), isCommentflag);
-        }
 
         try {
             programLength = Integer.parseInt(locctr, 16) - Integer.parseInt(startAddress, 16);

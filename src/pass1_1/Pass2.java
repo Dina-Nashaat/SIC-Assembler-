@@ -73,14 +73,11 @@ public class Pass2 {
 
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
-                    }
-                    else if (Utility.readStm(current, "operandLiteral").startsWith("="))
-                    {
-                        String op = Utility.checkLiterals(current,"operand");
+                    } else if (Utility.readStm(current, "operandLiteral").startsWith("=")) {
+                        String op = Utility.checkLiterals(current, "operand");
                         opAdd = Pass1.littab.get(op);
-                        
-                    } 
-                    else if (Utility.readStm(current, "operand") != "") {
+
+                    } else if (Utility.readStm(current, "operand") != "") {
                         if (Utility.readStm(current, "operand").contains(",")) {                             //Indexing
                             int cut = Utility.readStm(current, "operand").indexOf(",");
                             String operand = Utility.readStm(current, "operand").substring(0, cut - 1);
@@ -101,7 +98,6 @@ public class Pass2 {
                             error = true;
                         }
                     }
-                    
 
                     codeAdd = (int) OPTAB.optab.get(Utility.readStm(current, "opcode"));
                     String y = "00";
@@ -109,13 +105,11 @@ public class Pass2 {
                     int h = w.length();
                     symAdd = y.substring(0, 2 - h) + w;
 
-                }else if (Utility.readStm(current, "label").startsWith("*"))
-                    {
-                        String op = Utility.checkLiterals(current,"literal");
-                        symAdd = "";
-                        opAdd = Utility.asciiToHex(op);   
-                    } 
-                else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
+                } else if (Utility.readStm(current, "label").startsWith("*")) {
+                    String op = Utility.checkLiterals(current, "literal");
+                    symAdd = "";
+                    opAdd = Utility.asciiToHex(op);
+                } else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
                     String res = null;
                     int result = 0;
 
@@ -124,17 +118,17 @@ public class Pass2 {
                     } else if (Utility.readStm(current, "operand").matches(".*[0-9].*")) {
                         result = Integer.parseInt(Utility.readStm(current, "operand"));
                         res = Integer.toHexString(result);
-                    } else if (Utility.readStm(current, "operand").contains("+") || Utility.readStm(current, "operand").contains("-") ) {
+                    } else if (Utility.readStm(current, "operand").contains("+") || Utility.readStm(current, "operand").contains("-")) {
                         String[] token = Utility.readStm(current, "operand").split("-|\\+");
-                        int a = Integer.parseInt((String) symtab.get(token[0]),16);
-                        int b = Integer.parseInt((String) symtab.get(token[1]),16);
+                        int a = Integer.parseInt((String) symtab.get(token[0]), 16);
+                        int b = Integer.parseInt((String) symtab.get(token[1]), 16);
                         if (Utility.readStm(current, "operand").contains("+")) {
                             result = a + b;
                         } else if (Utility.readStm(current, "operand").contains("-")) {
                             result = Math.abs(a - b);
                         }
                         res = Integer.toHexString(result);
-                    }else{
+                    } else {
                         printError("Undefined Operand");
                     }
                     String y = "000000";
@@ -179,7 +173,7 @@ public class Pass2 {
                 }
 
                 j++;
-                if (j== lines.size()) break;
+                //if (j == lines.size()+1) break;
                 current = lines.get(j);
                 counter = current.substring(68, 74);
             }
@@ -193,14 +187,32 @@ public class Pass2 {
                  */
                 int current_address = Integer.parseInt(counter, 16);
                 int record_start = Integer.parseInt(recStart, 16);
-                int record_length = (current_address - record_start +3) / 2;
+                int record_length = (current_address - record_start + 3) / 2;
                 String record_length_hex = Integer.toHexString(record_length);
                 int g = record_length_hex.length();
                 recLength = s.substring(0, 2 - g) + record_length_hex;
-                
+
                 Utility.writeToLST(current, lstFile, counter, null);
                 Utility.writeTxt(objFile, recStart, recLength, record);
                 Utility.writeEnd(objFile, startAddress);
+            }
+        }
+        j++;
+        current = lines.get(j);
+        while (Utility.readStm(current, "label").startsWith("*")) {
+            current = lines.get(j);
+            String op = Utility.checkLiterals(current, "literal");
+            symAdd = "";
+            opAdd = Utility.asciiToHex(op);
+            if (error == true) {
+                Utility.writeToLST(current, lstFile, counter, errorstr);
+            } else {
+                Utility.writeToLST(current, lstFile, counter, null);
+            }
+            j++;
+            if (j == lines.size()) {
+                current = "";
+                break;
             }
         }
 
