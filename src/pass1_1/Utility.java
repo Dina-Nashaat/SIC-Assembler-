@@ -116,6 +116,8 @@ public class Utility {
     }
 
     public static void writeTxt(File file, String stAdd, String length, String objCode) {
+        if(length.length()==1)
+            length = "0"+length;
         buffer = "T" + stAdd + length + objCode;
         writeLine(buffer.toUpperCase(), file);
     }

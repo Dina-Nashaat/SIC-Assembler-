@@ -158,7 +158,7 @@ public class Pass2 {
                 Rec = symAdd.concat(opAdd);
                 record = record.concat(Rec);
 
-                if (record.length() == 60) {
+                if (record.length() >=54) {
                     int current_address = Integer.parseInt(counter, 16);
                     int record_start = Integer.parseInt(recStart, 16);
                     int record_length = current_address - record_start + 3;
@@ -233,7 +233,7 @@ public class Pass2 {
                     int m = hexa.length();
                     recStart = n.substring(0, 6 - m) + hexa;
                 }
-
+        recLength = Integer.toHexString(record.length()/2);
         Utility.writeTxt(objFile, recStart, recLength, record);
         Utility.writeEnd(objFile, startAddress);
         
