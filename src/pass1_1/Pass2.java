@@ -146,7 +146,7 @@ public class Pass2 {
                     symAdd = "";
                 } else {
                     opAdd = "";
-                    symAdd = "      ";
+                    symAdd = "";
                 }
 
                 Rec = symAdd.concat(opAdd);
@@ -189,7 +189,6 @@ public class Pass2 {
 
                 Utility.writeToLST(current, lstFile, counter, null);
                 Utility.writeTxt(objFile, recStart, recLength, record);
-                Utility.writeEnd(objFile, startAddress);
             }
         }
         j++;
@@ -200,7 +199,7 @@ public class Pass2 {
             symAdd = "";
             opAdd = Utility.asciiToHex(op);
                Rec = symAdd.concat(opAdd);
-                record = record.concat(Rec);
+               record = record.concat(Rec);
             if (error == true) {
                 Utility.writeToLST(current, lstFile, counter, errorstr);
             } else {
@@ -210,10 +209,12 @@ public class Pass2 {
             if (j == lines.size()) {
                 current = "";
                 break;
-            }
-
+            }            
         }
+        Utility.writeTxt(objFile, recStart, recLength, record);
+        Utility.writeEnd(objFile, startAddress);
         
 
     }
+    
 }
