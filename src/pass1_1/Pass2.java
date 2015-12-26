@@ -194,7 +194,7 @@ public class Pass2 {
                 recLength = s.substring(0, 2 - g) + record_length_hex;
 
                 Utility.writeToLST(current, lstFile, counter, null);
-                Utility.writeTxt(objFile, recStart, recLength, record);
+                //Utility.writeTxt(objFile, recStart, recLength, record);
             }
         }
         j++;
@@ -203,7 +203,10 @@ public class Pass2 {
             current = lines.get(j);
             String op = Utility.checkLiterals(current, "literal");
             symAdd = "";
-            opAdd = Utility.asciiToHex(op);
+            if(!Utility.readStm(current, "opcode").startsWith("x"))
+                opAdd = Utility.asciiToHex(op);
+            else 
+                opAdd = op;
                Rec = symAdd.concat(opAdd);
                record = record.concat(Rec);
             if (error == true) {
@@ -217,6 +220,20 @@ public class Pass2 {
                 break;
             }            
         }
+        if (record.length() == 60) {
+                    int current_address = Integer.parseInt(counter, 16);
+                    int record_start = Integer.parseInt(recStart, 16);
+                    int record_length = current_address - record_start + 3;
+                    String record_length_hex = Integer.toHexString(record_length);
+                    Utility.writeTxt(objFile, recStart, record_length_hex, record);            //write T record in object program
+                    record = "";
+                    //recStart = counter;
+                    String n = "000000";
+                    String hexa = addHex(counter, 3);
+                    int m = hexa.length();
+                    recStart = n.substring(0, 6 - m) + hexa;
+                }
+
         Utility.writeTxt(objFile, recStart, recLength, record);
         Utility.writeEnd(objFile, startAddress);
         

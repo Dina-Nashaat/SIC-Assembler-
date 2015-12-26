@@ -169,7 +169,7 @@ public class Utility {
                 if (stmt.length() < 14) {
                     end = stmt.length();
                 } else {
-                    end = 16;
+                    end = 20;
                 }
                 trgStm = stmt.substring(start, end).trim();
                 break;
