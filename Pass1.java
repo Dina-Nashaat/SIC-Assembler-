@@ -23,6 +23,7 @@ public class Pass1 {
     public static int programLength;
     public static String address = "000000";
     public static Hashtable symtab = new Hashtable();
+    public static Hashtable absrel = new Hashtable();
     public static boolean isCommentflag = false;
     private static String buffer = "0";
 
@@ -67,6 +68,7 @@ public class Pass1 {
                 String label = Utility.readStm(line, "label");
                 String code = Utility.readStm(line, "opcode");
                 String operand = Utility.readStm(line, "operand");
+                absrel.putIfAbsent(label, "R");
 
                 //check on labels: 
                 if (symtab.containsKey(label)) {       //If there is a label in the LABEL field, search symtab for Label
@@ -133,7 +135,7 @@ public class Pass1 {
                         printError("Invalid Operator");
                     }
                 } else if (code.equals("equ")) {
-                    //do nothing
+                    absrel.putIfAbsent(label, "A");
                 } else if (code.equals("org")) {
                     address = "000000";
                     if (!operand.equals("")) {
@@ -144,10 +146,10 @@ public class Pass1 {
                             int g = Integer.parseInt(operand);
                             locctr = Integer.toHexString(g);
                         }
-                    } else{
+                    } else {
                         locctr = buffer;
                     }
-                    
+
                     int h = locctr.length();
                     address = address.substring(0, 6 - h) + locctr;
                 } else {

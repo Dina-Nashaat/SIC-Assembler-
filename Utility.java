@@ -10,10 +10,14 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import static pass1_1.Pass1.programLength;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass2.Rec;
@@ -38,7 +42,7 @@ public class Utility {
         }
         return lines;
     }
-    
+
     public static String buffer = " ";
 
     public static File checkFile(String Filename) {
@@ -117,16 +121,17 @@ public class Utility {
     public static String readStm(String stmt, String type) {
         type = type.toLowerCase();
         int start, end = stmt.length();
-
+        String trgStm;
         switch (type) {
             case "label":
-                if (stmt.substring(0, 7).contains("      ")) {
+                if (stmt.substring(0, 7).equals("      ")) {
                     return "";
                 } else if (stmt.substring(0, 7).startsWith(" ")) {
                     return printError("Invalid Label String");
                 }
                 start = 0;
                 end = 7;
+                trgStm = stmt.substring(start, end).trim().toLowerCase();
                 break;
             case "opcode":
                 if (stmt.substring(9, stmt.length()).startsWith(" ")) {
@@ -138,6 +143,7 @@ public class Utility {
                 } else {
                     end = 14;
                 }
+                trgStm = stmt.substring(start, end).trim().toLowerCase();
                 break;
             case "operand":
                 if (stmt.substring(17, stmt.length()).startsWith(" ")) {
@@ -149,14 +155,37 @@ public class Utility {
                 } else {
                     end = 34;
                 }
+                 trgStm = stmt.substring(start, end).trim().toLowerCase();
                 break;
             case "comment":
                 start = 35;
                 end = stmt.length();
+                trgStm = stmt.substring(start, end).trim().toLowerCase();
+                break;
+            case "literal":
+                start = 8;
+                if (stmt.length() < 14) {
+                    end = stmt.length();
+                } else {
+                    end = 16;
+                }
+                 trgStm = stmt.substring(start, end).trim();
+                break;
+            case "operandLiteral":
+                if (stmt.substring(17, stmt.length()).startsWith(" ")) {
+                    return printError("Invalid operand String");
+                }
+                start = 17;
+                if (stmt.length() < 34) {
+                    end = stmt.length();
+                } else {
+                    end = 34;
+                }
+                 trgStm = stmt.substring(start, end).trim();
             default:
                 return printError("unidentified operation");
         }
-        String trgStm = stmt.substring(start, end).trim().toLowerCase();
+        
         return trgStm;
     }
 
@@ -218,4 +247,51 @@ public class Utility {
         writeLine(buffer, file);
 
     }
+
+    public static String checkLiterals(String line, String type) {
+        boolean HexFlag;
+
+        String operand="", op;
+        op = "";
+        Pattern p = Pattern.compile("\'([^\']*)\'");
+        Matcher m = p.matcher(operand);
+            
+        switch (type) {
+            case "operand":
+                operand = readStm(line, "operand");
+                p = Pattern.compile("\'([^\']*)\'");
+                m = p.matcher(operand);
+                break;
+            case "literal":
+                operand = readStm(line, "literal");
+                p = Pattern.compile("\\'([^\\']*)\\'");
+                m = p.matcher(operand);
+                break;
+        }
+        if (operand.startsWith("=")) {
+            operand = operand.substring(1);
+            if (operand.startsWith("X")) {
+                HexFlag = true;
+            } else {
+                HexFlag = false;
+            }
+            
+            while (m.find()) {
+                op = m.group(1);
+            }
+            return op;
+        } else {
+            return null;
+        }
+    }
+
+    public static String asciiToHex(String asciiValue) {
+        char[] chars = asciiValue.toCharArray();
+        StringBuffer hex = new StringBuffer();
+        for (int i = 0; i < chars.length; i++) {
+            hex.append(Integer.toHexString((int) chars[i]));
+        }
+        return hex.toString();
+    }
+
 }

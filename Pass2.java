@@ -7,6 +7,7 @@ package pass1_1;
 
 import java.io.File;
 import java.util.ArrayList;
+import static pass1_1.Pass1.absrel;
 import static pass1_1.Pass1.startAddress;
 import static pass1_1.Pass1.symtab;
 //import static pass1_1.Pass2.tempObjCode;
@@ -65,10 +66,12 @@ public class Pass2 {
         Utility.writeLine(Utility.writeObjectProg("H", null, null, null), objFile);
         j++;
         current = lines.get(j);
-        counter = current.substring(68, 74);
+        //counter = current.substring(68, 74);
+        counter = addHex(counter,3);
 
         while (!Utility.readStm(current, "opcode").equalsIgnoreCase("end")) {                    //While this is not end of program
             if (!isComment(current)) {                                                                  //If this is not a comment
+                
                 if (OPTAB.optab.containsKey(Utility.readStm(current, "opcode"))) {                //Search optab for opcode
 
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
@@ -102,6 +105,7 @@ public class Pass2 {
                     symAdd = y.substring(0, 2 - h) + w;
 
                 } else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
+                    
                     String res = null;
                     int result = 0;
 
@@ -110,17 +114,24 @@ public class Pass2 {
                     } else if (Utility.readStm(current, "operand").matches(".*[0-9].*")) {
                         result = Integer.parseInt(Utility.readStm(current, "operand"));
                         res = Integer.toHexString(result);
-                    } else if (Utility.readStm(current, "operand").contains("+") || Utility.readStm(current, "operand").contains("-") ) {
+                    } else if (Utility.readStm(current, "operand").contains("+") || Utility.readStm(current, "operand").contains("-")) {
                         String[] token = Utility.readStm(current, "operand").split("-|\\+");
-                        int a = Integer.parseInt((String) symtab.get(token[0]),16);
-                        int b = Integer.parseInt((String) symtab.get(token[1]),16);
-                        if (Utility.readStm(current, "operand").contains("+")) {
-                            result = a + b;
-                        } else if (Utility.readStm(current, "operand").contains("-")) {
+                        int a = Integer.parseInt((String) symtab.get(token[0]), 16);
+                        int b = Integer.parseInt((String) symtab.get(token[1]), 16);
+                        if (absrel.get(token[0]).equals("R") && absrel.get(token[1]).equals("R") && Utility.readStm(current, "operand").contains("-")) {
                             result = Math.abs(a - b);
+                        } else if (absrel.get(token[0]).equals("A") && absrel.get(token[1]).equals("A")) {
+                            if (Utility.readStm(current, "operand").contains("+")) {
+                                result = a + b;
+                            } else if (Utility.readStm(current, "operand").contains("-")) {
+                                result = Math.abs(a - b);
+                            }
+                        }else{
+                            printError("Illegal Operand Expression");
                         }
+
                         res = Integer.toHexString(result);
-                    }else{
+                    } else {
                         printError("Undefined Operand");
                     }
                     String y = "000000";
@@ -147,18 +158,20 @@ public class Pass2 {
                 if (record.length() == 60) {
                     int current_address = Integer.parseInt(counter, 16);
                     int record_start = Integer.parseInt(recStart, 16);
-                    int record_length = record.length()/2;
+                    int record_length = record.length() / 2;
                     String record_length_hex = Integer.toHexString(record_length);
                     int len = record_length_hex.length();
                     String n = "00";
-                     record_length_hex = n.substring(0, 2 - len) +  record_length_hex;
+                    record_length_hex = n.substring(0, 2 - len) + record_length_hex;
                     Utility.writeTxt(objFile, recStart, record_length_hex, record);            //write T record in object program
                     record = "";
                     //recStart = counter;
                     n = "000000";
-                    String hexa = addHex(counter, 3);
+                    /*String hexa = addHex(counter, 3);
                     len = hexa.length();
-                    recStart = n.substring(0, 6 - len) + hexa;
+                    recStart = n.substring(0, 6 - len) + hexa;*/
+                    len = counter.length();
+                    recStart = n.substring(0, 6 - len) + counter;
                 }
 
                 if (error == true) {
@@ -169,7 +182,8 @@ public class Pass2 {
 
                 j++;
                 current = lines.get(j);
-                counter = current.substring(68, 74);
+                //counter = current.substring(68, 74);
+                counter = addHex(counter,3);
             }
 
             if (Utility.readStm(current, "opcode").equals("end")) {
@@ -181,11 +195,11 @@ public class Pass2 {
                  */
                 int current_address = Integer.parseInt(counter, 16);
                 int record_start = Integer.parseInt(recStart, 16);
-                int record_length = current_address - record_start;
+                int record_length = (current_address - 3) - record_start;
                 String record_length_hex = Integer.toHexString(record_length);
                 int g = record_length_hex.length();
                 recLength = s.substring(0, 2 - g) + record_length_hex;
-                
+
                 Utility.writeToLST(current, lstFile, counter, null);
                 Utility.writeTxt(objFile, recStart, recLength, record);
                 Utility.writeEnd(objFile, startAddress);
