@@ -124,7 +124,7 @@ public class Utility {
 
         switch (type) {
             case "label":
-                if (stmt.substring(0, 7).contains("      ")) {
+                if (stmt.substring(0, 7).equals("      ")) {
                     return "";
                 } else if (stmt.substring(0, 7).startsWith(" ")) {
                     return printError("Invalid Label String");
@@ -157,6 +157,14 @@ public class Utility {
             case "comment":
                 start = 35;
                 end = stmt.length();
+            case "literal":
+                start = 8;
+                if (stmt.length() < 14) {
+                    end = stmt.length();
+                } else {
+                    end = 16;
+                }
+                break;
             default:
                 return printError("unidentified operation");
         }
@@ -223,11 +231,26 @@ public class Utility {
 
     }
 
-    public static String checkLiterals(String line) {
+    public static String checkLiterals(String line, String type) {
         boolean HexFlag;
-        String operand, op;
+
+        String operand="", op;
         op = "";
-        operand = readStm(line, "operand");
+        Pattern p = Pattern.compile("\'([^\']*)\'");
+        Matcher m = p.matcher(operand);
+            
+        switch (type) {
+            case "operand":
+                operand = readStm(line, "operand");
+                p = Pattern.compile("\'([^\']*)\'");
+                m = p.matcher(operand);
+                break;
+            case "literal":
+                operand = readStm(line, "literal");
+                p = Pattern.compile("\\'([^\\']*)\\'");
+                m = p.matcher(operand);
+                break;
+        }
         if (operand.startsWith("=")) {
             operand = operand.substring(1);
             if (operand.startsWith("X")) {
@@ -235,27 +258,7 @@ public class Utility {
             } else {
                 HexFlag = false;
             }
-
-            Pattern p = Pattern.compile("\'([^\']*)\'");
-            Matcher m = p.matcher(operand);
-            while (m.find()) {
-                op = m.group(1);
-            }
-            return op;
-        } else {
-            return null;
-        }
-    }
-
-    public static String checkLiterals2(String line) {
-        boolean HexFlag;
-        String operand, op;
-        op = "";
-        operand = readStm(line, "opcode");
-        if (operand.startsWith("=")) {
-            operand = operand.substring(1);
-            Pattern p = Pattern.compile("\'([^\']*)\'");
-            Matcher m = p.matcher(operand);
+            
             while (m.find()) {
                 op = m.group(1);
             }

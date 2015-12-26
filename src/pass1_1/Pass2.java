@@ -76,7 +76,7 @@ public class Pass2 {
                     }
                     else if (Utility.readStm(current, "operand").startsWith("="))
                     {
-                        String op = Utility.checkLiterals(current);
+                        String op = Utility.checkLiterals(current,"operand");
                         opAdd = Pass1.littab.get(op);
                         
                     } 
@@ -111,10 +111,9 @@ public class Pass2 {
 
                 }else if (Utility.readStm(current, "label").startsWith("*"))
                     {
-                        String op = Utility.checkLiterals2(current);
-                        symAdd = null;
-                        opAdd = Utility.asciiToHex(op);
-                        
+                        String op = Utility.checkLiterals(current,"literal");
+                        symAdd = "";
+                        opAdd = Utility.asciiToHex(op);   
                     } 
                 else if (Utility.readStm(current, "opcode").equalsIgnoreCase("equ")) {
                     String res = null;
@@ -180,6 +179,7 @@ public class Pass2 {
                 }
 
                 j++;
+                if (j==(lines.size()-1)) break;
                 current = lines.get(j);
                 counter = current.substring(68, 74);
             }

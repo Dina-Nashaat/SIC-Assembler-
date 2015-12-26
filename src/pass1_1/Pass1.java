@@ -64,7 +64,7 @@ public class Pass1 {
 
         while (!Utility.readStm(line, "opcode").equals("end")) //while OPCODE != END
         {
-            String op = Utility.checkLiterals(line);
+            String op = Utility.checkLiterals(line,"operand");
             if (op != null) {
                 littab.put(op, "0");
             }
