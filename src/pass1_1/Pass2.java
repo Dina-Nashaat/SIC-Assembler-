@@ -74,7 +74,7 @@ public class Pass2 {
                     if (Utility.readStm(current, "operand").startsWith("0")) {                          //found, but contains address in HEX (starts with 0)
                         opAdd = Utility.readStm(current, "operand").substring(1);
                     }
-                    else if (Utility.readStm(current, "operand").startsWith("="))
+                    else if (Utility.readStm(current, "operandLiteral").startsWith("="))
                     {
                         String op = Utility.checkLiterals(current,"operand");
                         opAdd = Pass1.littab.get(op);
@@ -179,7 +179,7 @@ public class Pass2 {
                 }
 
                 j++;
-                if (j==(lines.size()-1)) break;
+                if (j== lines.size()) break;
                 current = lines.get(j);
                 counter = current.substring(68, 74);
             }
